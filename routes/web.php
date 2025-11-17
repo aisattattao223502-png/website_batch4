@@ -18,6 +18,16 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+// About page route
+Route::get('/about', function () {
+    return Inertia::render('Website/About');
+})->name('about');
+
+// Products page route
+Route::get('/products', function () {
+    return Inertia::render('Website/Explore/Products');
+})->name('products');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
