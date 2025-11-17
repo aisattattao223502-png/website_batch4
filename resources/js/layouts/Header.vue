@@ -28,8 +28,27 @@
             <div class="text-sm sm:text-lg md:text-xl font-bold dynamic-text tracking-tight leading-tight">
               <span class="font-serif dynamic-j text-xl sm:text-2xl md:text-3xl italic">J</span>AMES
               <span class="font-serif pe-1 dynamic-p text-xl sm:text-2xl md:text-3xl italic">P</span>OLYMERS
-              <span class="block text-xs sm:text-sm md:text-base font-semibold dynamic-corp mt-0.5 leading-tight">
-                MANUFACTURING CORP.
+              
+              <!-- Animated Text Transition -->
+              <span class="block text-xs sm:text-sm md:text-base font-semibold dynamic-corp mt-0.5 leading-tight relative h-5 sm:h-6 overflow-hidden">
+                <transition name="slide-fade" mode="out-in">
+                  <span 
+                    v-if="showMainText" 
+                    :key="'main'"
+                    class="absolute inset-0 flex items-center"
+                  >
+                    MANUFACTURING CORP.
+                  </span>
+                  <span 
+                      v-else 
+                      :key="'tagline'"
+                      class="flex items-center whitespace-nowrap"
+                    >
+                      OUR EXPERTISE IS YOUR ADVANTAGE
+                  </span>
+
+
+                </transition>
               </span>
             </div>
           </div>
@@ -81,7 +100,7 @@
                   </Link>
                 </li>
                 <li>
-                  <Link href="/awards" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/awards-recognition" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     Awards
                   </Link>
                 </li>
@@ -128,7 +147,7 @@
                 </li>
                 <li>
                   <Link href="/careers" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
-                    Careers & Internships
+                    Careers
                   </Link>
                 </li>
                 <li>
@@ -215,7 +234,7 @@
             </li>
             <li>
               <Link
-                href="/awards"
+                href="/awards-recognition"
                 @click="closeMobileMenu"
                 class="block text-gray-800 hover:text-blue-600 font-semibold uppercase text-base py-3 border-b border-gray-100"
               >
@@ -306,10 +325,14 @@ const headerRef = ref(null);
 const mobileMenuOpen = ref(false);
 const scrollPosition = ref(0);
 const isDarkMode = ref(props.isHomepage);
+const showMainText = ref(true);
 const dropdowns = ref({
   explore: false,
   more: false,
 });
+
+// Text transition interval
+let textTransitionInterval = null;
 
 // Computed
 const logoPath = computed(() => {
@@ -344,6 +367,20 @@ const closeMobileMenu = () => {
 
 const toggleDropdown = (dropdown, state) => {
   dropdowns.value[dropdown] = state;
+};
+
+const startTextTransition = () => {
+  // Toggle text every 4 seconds
+  textTransitionInterval = setInterval(() => {
+    showMainText.value = !showMainText.value;
+  }, 4000);
+};
+
+const stopTextTransition = () => {
+  if (textTransitionInterval) {
+    clearInterval(textTransitionInterval);
+    textTransitionInterval = null;
+  }
 };
 
 const updateHeaderAppearance = () => {
@@ -423,6 +460,9 @@ onMounted(() => {
   window.addEventListener('scroll', updateHeaderAppearance, { passive: true });
   window.addEventListener('resize', updateHeaderAppearance, { passive: true });
 
+  // Start text transition animation
+  startTextTransition();
+
   // Make sure header is always visible
   if (headerRef.value) {
     headerRef.value.style.visibility = 'visible';
@@ -434,6 +474,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', updateHeaderAppearance);
   window.removeEventListener('resize', updateHeaderAppearance);
+  stopTextTransition();
   document.body.style.overflow = '';
 });
 </script>
@@ -444,6 +485,25 @@ header {
   z-index: 9999 !important;
   transform: translate3d(0, 0, 0) !important;
   will-change: transform;
+}
+
+/* Text Transition Animation */
+.slide-fade-enter-active {
+  transition: all 0.6s ease;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.6s ease;
+}
+
+.slide-fade-enter-from {
+  transform: translateY(10px);
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  transform: translateY(-10px);
+  opacity: 0;
 }
 
 /* Hamburger Icon Animation */
