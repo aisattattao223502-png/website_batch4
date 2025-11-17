@@ -1,8 +1,8 @@
 <template>
-
     <div>
         <Header />
     </div>
+    <Chatbot />
   <div class="homepage bg-gray-50 overflow-x-hidden">
     <!-- Modern Hero Section with Integrated Header -->
     <section class="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 min-h-screen flex items-center justify-center overflow-hidden pt-20">
@@ -159,7 +159,10 @@
               <h3 class="text-xl font-bold text-gray-800 mb-3">{{ category.title }}</h3>
               <p class="text-gray-600 mb-4 flex-grow">{{ category.description }}</p>
               <div class="mt-auto">
-                <Link href="/products" class="text-blue-600 font-semibold hover:text-blue-800 transition">
+                <Link 
+                  :href="`/products#${category.section}`" 
+                  class="text-blue-600 font-semibold hover:text-blue-800 transition"
+                >
                   Learn More <i class="fas fa-arrow-right ml-1"></i>
                 </Link>
               </div>
@@ -179,7 +182,8 @@
           Our advanced polymer solutions serve critical applications across multiple industries, enabling innovation and performance enhancement.
         </p>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-          <div v-for="(industry, index) in industries" :key="index" class="bg-gray-50 rounded-lg p-6 text-center transition duration-300 hover:shadow-lg hover:scale-105">
+          <div v-for="(industry, index) in industries" :key="index" class="bg-gray-50 rounded-lg p-6 text-center transition duration-300 hover:shadow-lg hover:scale-105" data-aos="fade-up" 
+            :data-aos-delay="index * 100">
             <div class="bg-blue-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="fas text-white text-2xl" :class="industry.icon"></i>
             </div>
@@ -224,54 +228,80 @@
     </section>
 
 
+    <!-- Customers Section - Single Line Carousel with Buttons -->
     <section class="py-16 bg-white">
-    <div class="container mx-auto px-4">
-      <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
-        Our Valued Customers
-      </h2>
-      <p class="text-xl text-center text-gray-600 max-w-3xl mx-auto mb-12">
-        We're proud to partner with industry leaders across various sectors, providing them with high-performance polymer solutions.
-      </p>
+      <div class="container mx-auto px-4">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
+          Our Valued Customers
+        </h2>
+        <p class="text-xl text-center text-gray-600 max-w-3xl mx-auto mb-12">
+          We're proud to partner with industry leaders across various sectors, providing them with high-performance polymer solutions.
+        </p>
 
-      <!-- Honeycomb Layout -->
-<div class="hex-wrapper">
-  <div
-    v-for="(row, rowIndex) in layout"
-    :key="rowIndex"
-    class="hex-row"
-    :class="{ offset: rowIndex % 2 !== 0 }"
-  >
-    <!-- Check if cell is NOT null -->
-    <div
-      v-for="(cell, cellIndex) in row"
-      :key="cellIndex"
-    >
-      <div
-        v-if="cell !== null"
-        class="hexagon"
-        data-aos="flip-right"
-        :data-aos-delay="(rowIndex * 5 + cellIndex) * 5"
-      >
-        <div class="hex-inner">
-          <img
-            v-if="logos[cell]"
-            :src="logos[cell]"
-            alt="Customer Logo"
-          />
-          <span v-else class="coming-soon">Coming Soon</span>
+        <!-- Single Line Carousel with Navigation -->
+        <div class="relative max-w-7xl mx-auto">
+          <!-- Carousel Container -->
+          <div class="overflow-hidden">
+            <div 
+              class="flex transition-transform duration-500 ease-in-out"
+              :style="{ transform: `translateX(-${currentSlide * slideWidth}px)` }"
+            >
+              <!-- Customer Logos -->
+              <div
+                v-for="(logo, index) in allCustomerLogos"
+                :key="index"
+                class="flex-shrink-0 px-4"
+                :style="{ width: `${cardWidth}px` }"
+              >
+                <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 p-8 flex items-center justify-center h-40">
+                  <img
+                    v-if="logo !== 'coming_soon'"
+                    :src="logo"
+                    alt="Customer Logo"
+                    class="max-w-full max-h-24 object-contain"
+                  />
+                  <span v-else class="text-green-600 font-bold text-center">
+                    Coming Soon
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+          <button
+            @click="prevSlide"
+            :disabled="currentSlide === 0"
+            class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 bg-white hover:bg-blue-600 text-blue-600 hover:text-white rounded-full p-3 md:p-4 shadow-lg transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed z-10"
+            aria-label="Previous slide"
+          >
+            <i class="fas fa-chevron-left text-lg md:text-xl"></i>
+          </button>
+
+          <button
+            @click="nextSlide"
+            :disabled="currentSlide >= maxSlide"
+            class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 bg-white hover:bg-blue-600 text-blue-600 hover:text-white rounded-full p-3 md:p-4 shadow-lg transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed z-10"
+            aria-label="Next slide"
+          >
+            <i class="fas fa-chevron-right text-lg md:text-xl"></i>
+          </button>
+
+          <!-- Progress Bar -->
+          <div class="mt-8 mx-auto max-w-md">
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                class="h-full bg-blue-600 transition-all duration-300 rounded-full"
+                :style="{ width: `${progress}%` }"
+              ></div>
+            </div>
+            <div class="text-center mt-2 text-sm text-gray-600">
+              {{ currentSlide + 1 }} / {{ maxSlide + 1 }}
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- When the cell IS null -->
-      <div v-else class="hexagon-invisible">
-        <div class="hex-inner"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-    </div>
-  </section>
+    </section>
 
     <!-- Statistics Section -->
     <section class="py-16 bg-white">
@@ -313,12 +343,16 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3';
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+
+import Header from '@/layouts/Header.vue';
+import Footer from '@/layouts/Footer.vue';
+import Chatbot from '@/layouts/Chatbot.vue'; 
+
 import axios from 'axios'
-import { ref, onMounted, onUnmounted } from 'vue'
-import Header from '../../layouts/Header.vue';
-import Footer from '../../layouts/Footer.vue';
-
-
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+AOS.init();
 
 const heading = ref("Our Valued Customers");
 const subheading = ref(
@@ -333,22 +367,73 @@ const layout = ref([
   [11, 12, 13, 14, 15],
 ]);
 
-const logos = {
-  1: "storage/assets/home/3M.png",
-  2: "storage/assets/home/Unilab.png",
-  3: "storage/assets/home/APC.png",
-  4: "storage/assets/home/Carrier.png",
-  5: "storage/assets/home/Panasonic.png",
-  6: "storage/assets/home/Koppel.png",
-  7: "storage/assets/home/Dutch.png",
-  8: "storage/assets/home/WB.png",
-  9: "storage/assets/home/ACS.png",
-  10: "storage/assets/home/Purefoods.png",
-  11: "storage/assets/home/Condura.png",
-  12: "storage/assets/home/Continental.png",
-  14: "storage/assets/home/coming_soon.png",
-  13: "storage/assets/home/coming_soon.png",
-  15: "storage/assets/home/coming_soon.png",
+// Remove the old layout and logos objects, replace with:
+
+// Customer logos array
+const allCustomerLogos = [
+  "storage/assets/home/3M.png",
+  "storage/assets/home/Unilab.png",
+  "storage/assets/home/APC.png",
+  "storage/assets/home/Carrier.png",
+  "storage/assets/home/Panasonic.png",
+  "storage/assets/home/Koppel.png",
+  "storage/assets/home/Dutch.png",
+  "storage/assets/home/WB.png",
+  "storage/assets/home/ACS.png",
+  "storage/assets/home/Purefoods.png",
+  "storage/assets/home/Condura.png",
+  "storage/assets/home/Continental.png",
+  "storage/assets/home/soon.jpg",
+  "storage/assets/home/soon.jpg",
+  "storage/assets/home/soon.jpg",
+];
+
+// Carousel state
+const currentSlide = ref(0);
+const cardWidth = ref(280); // Width of each card + padding
+const visibleCards = ref(4); // Number of visible cards at once
+
+// Computed properties
+const slideWidth = computed(() => cardWidth.value);
+const maxSlide = computed(() => Math.max(0, allCustomerLogos.length - visibleCards.value));
+const progress = computed(() => {
+  if (maxSlide.value === 0) return 100;
+  return ((currentSlide.value / maxSlide.value) * 100);
+});
+
+// Navigation functions
+const nextSlide = () => {
+  if (currentSlide.value < maxSlide.value) {
+    currentSlide.value++;
+  }
+};
+
+const prevSlide = () => {
+  if (currentSlide.value > 0) {
+    currentSlide.value--;
+  }
+};
+
+// Handle responsive card visibility
+const updateVisibleCards = () => {
+  const width = window.innerWidth;
+  if (width < 640) {
+    visibleCards.value = 1;
+    cardWidth.value = 240;
+  } else if (width < 768) {
+    visibleCards.value = 2;
+    cardWidth.value = 260;
+  } else if (width < 1024) {
+    visibleCards.value = 3;
+    cardWidth.value = 270;
+  } else {
+    visibleCards.value = 4;
+    cardWidth.value = 280;
+  }
+  // Reset to first slide if current position is invalid
+  if (currentSlide.value > maxSlide.value) {
+    currentSlide.value = maxSlide.value;
+  }
 };
 
 const visitorCount = ref(0)
@@ -388,11 +473,28 @@ onMounted(async () => {
     // easing: 'ease-out-cubic' // optional
   });
 
-  // Small extra: force a refresh after resources load to ensure all elements are picked up.
-  // (useful when images/video or dynamic content affect layout)
   AOS.refresh();
 
   // Also call refresh on window load in case media/images change layout after initial mount
+  aosRefreshHandler = () => AOS.refresh();
+  window.addEventListener('load', aosRefreshHandler);
+
+  // Add carousel resize handler
+  updateVisibleCards();
+  window.addEventListener('resize', updateVisibleCards);
+});
+
+onMounted(async () => {
+  // Your existing code
+  await incrementVisitorCount()
+  await fetchVisitorCount()
+
+  AOS.init({
+    duration: 800,
+    once: true,
+  });
+
+  AOS.refresh();
   aosRefreshHandler = () => AOS.refresh();
   window.addEventListener('load', aosRefreshHandler);
 });
@@ -410,23 +512,27 @@ onUnmounted(() => {
 const categories = [
   {
     image: '/storage/assets/home/Thermoplastic.png',
-    title: 'Thermoplastic Elastomers',
-    description: 'High-performance TPE compounds offering excellent flexibility, durability, and processing characteristics for diverse applications.'
+    title: 'Thermoplastic Materials & Engineering Plastics',
+    description: 'High-performance TPE compounds offering excellent flexibility, durability, and processing characteristics for diverse applications.',
+    section: 'plastic'  // ADD THIS
   },
   {
     image: '/storage/assets/home/Molded.png',
-    title: 'Engineering Plastics',
-    description: 'Specialized compounds designed for demanding mechanical, thermal, and chemical resistance applications.'
+    title: 'Molded Rubber Compounds',
+    description: 'Specialized compounds designed for demanding mechanical, thermal, and chemical resistance applications.',
+    section: 'rubber'  // ADD THIS
   },
   {
     image: '/storage/assets/home/Resin.png',
-    title: 'Custom Compounds',
-    description: 'Tailored polymer solutions developed to meet your specific performance, regulatory, and processing requirements.'
+    title: 'Master Batch of Resin',
+    description: 'Tailored polymer solutions developed to meet your specific performance, regulatory, and processing requirements.',
+    section: 'custom'  // ADD THIS
   },
   {
     image: '/storage/assets/home/Services.png',
-    title: 'Technical Services',
-    description: 'Comprehensive support including material selection, testing, processing optimization, and troubleshooting.'
+    title: 'Engineering, Design & Technical Services',
+    description: 'Comprehensive support including material selection, testing, processing optimization, and troubleshooting.',
+    section: 'services'  // ADD THIS
   }
 ];
 
@@ -466,95 +572,29 @@ const industries = [
 const recognitionAwards = [
   {
     icon: 'fa-trophy',
-    title: '2022 Polymer Innovation Award',
-    description: 'Recognized for our breakthrough in high-temperature resistant TPE compounds by the International Polymer Association.'
+    title: 'Best in Environmental Management System Award (2007)',
+    description: 'Awarded by Panasonic Manufacturing Philippines Corporation (PMPC) and Panasonic Communication Philippines Corporation, this recognition honors outstanding environmental practices from April 2006 to March 2007.'
   },
   {
     icon: 'fa-trophy',
-    title: '2021 Excellence in Sustainability',
-    description: 'Awarded for our eco-friendly polymer series with 50% recycled content without compromising performance.'
+    title: 'Preferred Supplier (2011)',
+    description: 'Given this 3rd day of May 2011 at Bayanihan Center, United Laboratories Inc.'
   },
   {
     icon: 'fa-certificate',
-    title: '2020 Supplier of the Year',
-    description: 'Honored by our automotive clients for consistent quality and innovation in material solutions.'
+    title: 'Golden Globe Annual Awards for Business Excellence - BEST (2023)',
+    description: 'Recognized in 2023 by the Golden Globe Annual Awards for Business Excellence, this prestigious award highlights exceptional performance, innovation, and business leadership in the industry.'
   },
   {
     icon: 'fa-certificate',
-    title: 'ISO 9001:2015 Certified',
-    description: 'Our quality management system meets international standards for consistency and continuous improvement.'
+    title: 'ISO 14001:2015 & ISO 9001:2015 Recertification (2025)',
+    description: 'Achieving this reflects our dedication to sustainable operations and adherence to international standards for quality, consistency, and continuous improvement.'
   }
 ];
 </script>
 
 
 <style scoped>
-.hex-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-}
-
-/* Center rows properly */
-.hex-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: -29px;
-}
-
-/* Fix staggered alignment */
-.hex-row.offset {
-  transform: translateX(75px);
-}
-
-/* Hex outer shell */
-.hexagon {
-  width: 150px;
-  height: 165px;
-  background: linear-gradient(135deg, #3b82f6, #10b981);
-  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 2px;
-  transition: transform 0.3s ease;
-}
-
-.hexagon:hover {
-  transform: scale(1.05) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* Inner white part */
-.hex-inner {
-  width: 128px;
-  height: 142px;
-  background-color: white;
-  clip-path: inherit;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hex-inner img {
-  max-width: 70%;
-  max-height: 70%;
-  object-fit: contain;
-}
-
-.coming-soon {
-  color: #4caf50;
-  font-weight: bold;
-  font-size: 0.875rem;
-  text-align: center;
-}
-
-.hexagon-invisible {
-  opacity: none;
-  pointer-events: none;
-}
 
 /* Responsive */
 @media (max-width: 1015px) {
@@ -588,6 +628,34 @@ const recognitionAwards = [
   }
   .hex-row.offset {
     transform: translateX(25px);
+  }
+}
+
+/* Infinite Scroll Animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-150%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 10s linear infinite;
+}
+
+.animate-scroll:hover,
+.pause-animation:hover {
+  animation-play-state: paused;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .animate-scroll > div {
+    width: 12rem !important;
+    margin-left: 0.75rem !important;
+    margin-right: 0.75rem !important;
   }
 }
 </style>

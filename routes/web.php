@@ -5,6 +5,11 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use App\Http\Controllers\VisitorController;
+
+Route::get('/visitors/get', [VisitorController::class, 'getCount']);
+Route::post('/visitors/increment', [VisitorController::class, 'incrementCount']);
+
 // Home page
 Route::get('/', function () {
     return Inertia::render('Website/Home', [
