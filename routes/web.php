@@ -42,6 +42,56 @@ Route::get('/news-events/{id}', [NewsEventController::class, 'show'])->name('new
 Route::get('/news-events/type/{type}', [NewsEventController::class, 'byType'])
     ->name('news-events.type');
 
+// Industries page route
+Route::get('/industries', function () {
+    return Inertia::render('Website/Explore/Industries');
+})->name('industries');
+
+// Awards page route
+Route::get('/awards', function () {
+    return Inertia::render('Website/Explore/Awards');
+})->name('awards');
+
+// Contact page route
+Route::get('/contact', function () {
+    return Inertia::render('Website/Contact', [
+        'content' => [
+            'banner' => [
+                'heading' => 'Contact Us',
+                'breadcrumb' => 'Contact',
+                'background_image' => asset('storage/assets/img/banners/contact_banner.jpg'),
+                'overlay_image' => asset('storage/assets/img/banners/contact_banner.jpg')
+            ],
+            'contact_info' => [
+                'heading' => 'Get In Touch',
+                'subheading' => 'Our team is ready to assist you with any questions about our polymer solutions and services.',
+                'phone_title' => 'Call Us',
+                'phone_description' => 'Speak directly with our technical team',
+                'phone_number' => '+(02) 8529 8978',
+                'phone_display' => '+63 (2) 8529 8978',
+                'email_title' => 'Email Us',
+                'email_description' => 'Get detailed information about our products',
+                'email_address' => 'jamespro.asia101@gmail.com',
+                'email_display' => 'jamespro.asia101@gmail.com',
+                'location_title' => 'Visit Us',
+                'location_description' => 'Schedule a visit to our facilities',
+                'location_link_text' => 'View Location'
+            ],
+            'map' => [
+                'iframe_src' => 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d488.8849933426653!2d120.95594617157205!3d14.452064021803464!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397cd8f21555555%3A0xa3b07b32dcee1f3d!2sJames%20Polymers%20Manufacturing%20Corporation.!5e0!3m2!1sen!2sph!4v1746000140786!5m2!1sen!2sph'
+            ],
+            'cta' => [
+                'heading' => 'Ready to Discuss Your Project?',
+                'description' => 'Our technical sales team is available to help you select the right polymer solution for your application.',
+                'button_text' => 'View Products',
+                'background_image' => asset('storage/assets/img/banners/contact_cta.jpg')
+            ],
+            // ADD THIS LINE - Replace with your actual Google Form URL
+            'google_form_url' => 'https://forms.gle/Hn4KY5cUWcA8HiP8A', '_blank'
+        ]
+    ]);
+})->name('contact');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -50,6 +100,24 @@ Route::get('/dashboard', function () {
 Route::get('/sustainability', function () {
     return Inertia::render('Website/More/Sustainability');
 })->name('sustainability');
+
+// Overview Process page route
+Route::get('/overview-process', function () {
+    return Inertia::render('Website/More/OverviewProcess');
+})->name('overview-process');
+
+// News & Events page route
+Route::get('/news-events', function () {
+    return Inertia::render('Website/More/NewsEvents');
+})->name('news-events');
+
+// Careers page route
+Route::get('/careers', function () {
+    return Inertia::render('Website/More/Careers', [
+        'fullTimeFormUrl' => 'https://forms.gle/ddrfp3VqGMMk3knf9',
+        'ojtFormUrl' => 'http://forms.gle/R4qkB7Aw6ViFXnVc9'
+    ]);
+})->name('careers');
 
 // FAQ page route
 Route::get('/faq', function () {

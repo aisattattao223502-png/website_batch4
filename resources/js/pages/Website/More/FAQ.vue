@@ -4,7 +4,7 @@
     <!-- Hero Section -->
     <div class="hero-section mt-12">
       <div class="hero-overlay" />
-      <div class="hero-bg" :style="{ backgroundImage: `url(${headerBg})` }" />
+      <div class="hero-bg"/>
       <div class="hero-content">
         <div class="hero-badge">
           <i class="fas fa-cogs" />
