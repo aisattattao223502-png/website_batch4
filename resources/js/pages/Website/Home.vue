@@ -315,8 +315,8 @@
 import { Link } from '@inertiajs/vue3';
 import axios from 'axios'
 import { ref, onMounted, onUnmounted } from 'vue'
-//import Header from '../../Layouts/Header.vue';
-//import Footer from '../../Layouts/Footer.vue';
+import Header from '../../layouts/Header.vue';
+import Footer from '../../layouts/Footer.vue';
 
 
 
