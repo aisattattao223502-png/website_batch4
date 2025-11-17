@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\IndustryController;
+use App\Http\Controllers\NewsEventController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,10 +26,21 @@ Route::get('/about', function () {
     return Inertia::render('Website/About');
 })->name('about');
 
-// Products page route
-Route::get('/products', function () {
-    return Inertia::render('Website/Explore/Products');
-})->name('products');
+// Products Routes
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/products/category/{category}', [ProductController::class, 'byCategory'])
+    ->name('products.category');
+
+// Industries Routes
+Route::get('/industries', [IndustryController::class, 'index'])->name('industries.index');
+Route::get('/industries/{id}', [IndustryController::class, 'show'])->name('industries.show');
+
+// News & Events Routes
+Route::get('/news-events', [NewsEventController::class, 'index'])->name('news-events.index');
+Route::get('/news-events/{id}', [NewsEventController::class, 'show'])->name('news-events.show');
+Route::get('/news-events/type/{type}', [NewsEventController::class, 'byType'])
+    ->name('news-events.type');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
