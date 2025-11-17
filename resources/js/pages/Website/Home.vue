@@ -344,6 +344,7 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useHead } from '@vueuse/head'; // for Search Engine Optimization (SEO)
 
 import Header from '@/layouts/Header.vue';
 import Footer from '@/layouts/Footer.vue';
@@ -353,6 +354,111 @@ import axios from 'axios'
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 AOS.init();
+
+// ADD SEO META TAGS
+useHead({
+  title: 'James Polymers Manufacturing Corporation - Leading Polymer Solutions Provider',
+  meta: [
+    {
+      name: 'description',
+      content: 'James Polymers Manufacturing Corporation delivers high-performance polymer compounds with over 45 years of expertise. Specializing in thermoplastic materials, molded rubber compounds, and engineering plastics for aerospace, automotive, medical, and industrial applications.'
+    },
+    {
+      name: 'keywords',
+      content: 'polymer compounds, thermoplastic materials, engineering plastics, molded rubber, master batch resin, polymer manufacturing, Philippines, ISO certified, James Polymers, TPE compounds, industrial polymers'
+    },
+    // Open Graph / Facebook
+    {
+      property: 'og:type',
+      content: 'website'
+    },
+    {
+      property: 'og:title',
+      content: 'James Polymers Manufacturing Corporation - Leading Polymer Solutions'
+    },
+    {
+      property: 'og:description',
+      content: 'High-performance polymer compounds tailored to your specific requirements with over 45 years of expertise in thermoplastic materials and engineering plastics.'
+    },
+    {
+      property: 'og:image',
+      content: '/storage/assets/img/certifications/cert.png'
+    },
+    {
+      property: 'og:url',
+      content: 'https://jamespolymers.com' // domain link
+    },
+    // Twitter
+    {
+      name: 'twitter:card',
+      content: 'summary_large_image'
+    },
+    {
+      name: 'twitter:title',
+      content: 'James Polymers Manufacturing Corporation'
+    },
+    {
+      name: 'twitter:description',
+      content: 'Leading provider of high-performance polymer compounds with 45+ years of expertise'
+    },
+    {
+      name: 'twitter:image',
+      content: '/storage/assets/img/certifications/cert.png'
+    },
+    // Additional SEO
+    {
+      name: 'author',
+      content: 'James Polymers Manufacturing Corporation'
+    },
+    {
+      name: 'robots',
+      content: 'index, follow'
+    },
+    {
+      name: 'googlebot',
+      content: 'index, follow'
+    }
+  ],
+  link: [
+    {
+      rel: 'canonical',
+      href: 'https://jamespolymers.com' // Domain URL
+    }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "James Polymers Manufacturing Corporation",
+        "description": "Leading manufacturer of high-performance polymer compounds",
+        "url": "https://jamespolymers.com", // Domain URL
+        "logo": "/storage/assets/img/logo-whitebg.png",
+        "foundingDate": "1978",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "016 Panapaan II, Bacoor City, Cavite", 
+          "addressLocality": "Bacoor City",
+          "addressRegion": "Cavite",
+          "postalCode": "4102", 
+          "addressCountry": "PH"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "Customer Service",
+          "telephone": "+63-2-852989785", 
+          "email": "jamespolymers.international@gmail.com",
+          "availableLanguage": ["en", "fil"]
+        },
+        "sameAs": [
+          "https://www.facebook.com/JamesPolymersMfg.International",
+          "https://www.linkedin.com/in/jgeintl/"
+        ]
+      })
+    }
+  ]
+});
 
 const heading = ref("Our Valued Customers");
 const subheading = ref(
@@ -366,8 +472,6 @@ const layout = ref([
   [ 7, 8, 9, 10, null],
   [11, 12, 13, 14, 15],
 ]);
-
-// Remove the old layout and logos objects, replace with:
 
 // Customer logos array
 const allCustomerLogos = [
@@ -484,20 +588,6 @@ onMounted(async () => {
   window.addEventListener('resize', updateVisibleCards);
 });
 
-onMounted(async () => {
-  // Your existing code
-  await incrementVisitorCount()
-  await fetchVisitorCount()
-
-  AOS.init({
-    duration: 800,
-    once: true,
-  });
-
-  AOS.refresh();
-  aosRefreshHandler = () => AOS.refresh();
-  window.addEventListener('load', aosRefreshHandler);
-});
 
 onUnmounted(() => {
   if (aosRefreshHandler) {
