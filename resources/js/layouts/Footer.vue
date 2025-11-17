@@ -235,7 +235,7 @@ const companyLinks = [
 <style scoped>
 .footer-bg {
   background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.9)),
-    url('/storage/assets/img/footer/bgg.jpg');
+  url('/storage/assets/img/footer/bgg.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

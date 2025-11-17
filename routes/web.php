@@ -5,6 +5,11 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use App\Http\Controllers\VisitorController;
+
+Route::get('/visitors/get', [VisitorController::class, 'getCount']);
+Route::post('/visitors/increment', [VisitorController::class, 'incrementCount']);
+
 // Home page
 Route::get('/', function () {
     return Inertia::render('Website/Home', [
@@ -12,6 +17,16 @@ Route::get('/', function () {
         'canRegister' => Route::has('register'),
     ]);
 })->name('home');
+
+// About page route
+Route::get('/about', function () {
+    return Inertia::render('Website/About');
+})->name('about');
+
+// Products page route
+Route::get('/products', function () {
+    return Inertia::render('Website/Explore/Products');
+})->name('products');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
