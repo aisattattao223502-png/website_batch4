@@ -6,7 +6,7 @@
     <div class="bg-gray-50">
       <!-- Page Banner -->
       <section
-        class="relative bg-blue-400 h-96 flex items-center justify-center bg-cover bg-center"
+        class="relative bg-blue-400 h-96 flex items-center justify-center bg-cover bg-center mt-[14vh]"
         style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/storage/assets/img/banners/industries_banner.jpg')"
       >
         <div class="container mx-auto px-4 text-center text-white relative z-10">

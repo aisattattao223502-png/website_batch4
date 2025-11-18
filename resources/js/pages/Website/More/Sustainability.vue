@@ -255,81 +255,78 @@
                 </div>
 
                <!-- Certificates Section -->
-<div class="certifications-section">
-    <h3 class="certifications-title"><b>Our Certifications</b></h3>
+                <div class="certifications-section">
+                    <h3 class="certifications-title"><b>Our Certifications</b></h3>
 
-    <div class="certifications-container">
-        <!-- First 4 Certificates -->
-        <div class="certifications-grid first-row">
-            <!-- Certificate 1 -->
-            <div class="certification-card">
-                <div class="cert-image">
-                    <img src="/storage/assets/img/certifications/ISO-9001.png" alt="ISO 9001:2015 Certification" />
-                </div>
-                <h4 class="cert-title">ISO 9001:2015 Certification</h4>
-            </div>
+                    <div class="certifications-container">
+                        <!-- All 8 Certificates in One Grid -->
+                        <div class="certifications-grid">
+                            <!-- Certificate 1 -->
+                            <div class="certification-card">
+                                <div class="cert-image">
+                                    <img src="/storage/assets/img/certifications/ISO-9001.png" alt="ISO 9001:2015 Certification" />
+                                </div>
+                                <h4 class="cert-title">ISO 9001:2015</h4>
+                            </div>
 
-            <!-- Certificate 2 -->
-            <div class="certification-card">
-                <div class="cert-image">
-                    <img src="/storage/assets/img/certifications/ISO-14001.png" alt="ISO 14001:2015 Certification" />
-                </div>
-                <h4 class="cert-title">ISO 14001:2015 Certification</h4>
-            </div>
+                            <!-- Certificate 2 -->
+                            <div class="certification-card">
+                                <div class="cert-image">
+                                    <img src="/storage/assets/img/certifications/ISO-14001.png" alt="ISO 14001:2015 Certification" />
+                                </div>
+                                <h4 class="cert-title">ISO 14001:2015</h4>
+                            </div>
 
-            <!-- Certificate 3 -->
-            <div class="certification-card">
-                <div class="cert-image">
-                    <img src="/storage/assets/img/certifications/RoHS.png" alt="RoHS Compliant" />
-                </div>
-                <h4 class="cert-title">RoHS Compliant</h4>
-            </div>
+                            <!-- Certificate 3 -->
+                            <div class="certification-card">
+                                <div class="cert-image">
+                                    <img src="/storage/assets/img/certifications/RoHS.png" alt="RoHS Compliant" />
+                                </div>
+                                <h4 class="cert-title">RoHS Compliant</h4>
+                            </div>
 
-            <!-- Certificate 4 -->
-            <div class="certification-card">
-                <div class="cert-image">
-                    <img src="/storage/assets/img/certifications/Reach.png" alt="Reach Compliant" />
-                </div>
-                <h4 class="cert-title">Reach Compliant</h4>
-            </div>
-        </div>
+                            <!-- Certificate 4 -->
+                            <div class="certification-card">
+                                <div class="cert-image">
+                                    <img src="/storage/assets/img/certifications/Reach.png" alt="Reach Compliant" />
+                                </div>
+                                <h4 class="cert-title">Reach Compliant</h4>
+                            </div>
 
-        <!-- Remaining Certificates (5-8) -->
-        <div class="certifications-grid second-row">
-            <!-- Certificate 5 -->
-            <div class="certification-card">
-                <div class="cert-image">
-                    <img src="/storage/assets/img/certifications/cGMP.png" alt="cGMP Compliant" />
-                </div>
-                <h4 class="cert-title">cGMP Compliant</h4>
-            </div>
+                            <!-- Certificate 5 -->
+                            <div class="certification-card">
+                                <div class="cert-image">
+                                    <img src="/storage/assets/img/certifications/cGMP.png" alt="cGMP Compliant" />
+                                </div>
+                                <h4 class="cert-title">cGMP Compliant</h4>
+                            </div>
 
-            <!-- Certificate 6 -->
-            <div class="certification-card">
-                <div class="cert-image">
-                    <img src="/storage/assets/img/certifications/TQCSI-9001.png" alt="TQCSI 9001" />
-                </div>
-                <h4 class="cert-title">TQCSI 9001 - Quality Certified</h4>
-            </div>
+                            <!-- Certificate 6 -->
+                            <div class="certification-card">
+                                <div class="cert-image">
+                                    <img src="/storage/assets/img/certifications/TQCSI-9001.png" alt="TQCSI 9001" />
+                                </div>
+                                <h4 class="cert-title">TQCSI 9001</h4>
+                            </div>
 
-            <!-- Certificate 7 -->
-            <div class="certification-card">
-                <div class="cert-image">
-                    <img src="/storage/assets/img/certifications/TQCSI 14001.png" alt="TQCSI 14001 " />
-                </div>
-                <h4 class="cert-title">TQCSI 14001 - Environmentally Awareness</h4>
-            </div>
+                            <!-- Certificate 7 -->
+                            <div class="certification-card">
+                                <div class="cert-image">
+                                    <img src="/storage/assets/img/certifications/TQCSI 14001.png" alt="TQCSI 14001 " />
+                                </div>
+                                <h4 class="cert-title">TQCSI 14001</h4>
+                            </div>
 
-            <!-- Certificate 8 -->
-            <div class="certification-card">
-                <div class="cert-image">
-                    <img src="/storage/assets/img/certifications/BEST.png" alt="BEST" />
+                            <!-- Certificate 8 -->
+                            <div class="certification-card">
+                                <div class="cert-image">
+                                    <img src="/storage/assets/img/certifications/BEST.png" alt="BEST" />
+                                </div>
+                                <h4 class="cert-title">BEST</h4>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h4 class="cert-title">BEST</h4>
-            </div>
-        </div>
-    </div>
-</div>
 
                 <!-- Continual Improvement & Kaizen -->
                 <div class="improvement-section">
@@ -724,7 +721,7 @@ onUnmounted(() => {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 1rem;
-    padding: 3rem;
+    padding: 1.5rem; /* Smaller padding for mobile */
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
 }
 
@@ -1091,30 +1088,33 @@ onUnmounted(() => {
     color: #374151;
 }
 
-/* Certifications Section Centering */
+/* Certifications Section - Mobile First */
 .certifications-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    margin: 2rem 0;
+}
+
+.certifications-title {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: #1f2937;
 }
 
 .certifications-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3rem;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 1rem;
 }
 
 .certifications-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+    gap: 1.5rem;
     width: 100%;
-    justify-items: center;
 }
 
 .certification-card {
@@ -1122,46 +1122,74 @@ onUnmounted(() => {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    max-width: 280px;
-    width: 100%;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.certification-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .cert-image {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
+    width: 100%;
+    height: 120px; /* Smaller for mobile */
 }
 
 .cert-image img {
     max-width: 100%;
-    height: auto;
+    max-height: 100%;
     object-fit: contain;
 }
 
 .cert-title {
-    font-size: 0.875rem;
+    font-size: 0.75rem; /* Smaller text for mobile */
     font-weight: 600;
     color: #1f2937;
-    margin-top: 0.5rem;
-    line-height: 1.4;
+    line-height: 1.3;
+    margin: 0;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
+/* Tablet - 3 columns */
+@media (min-width: 640px) {
     .certifications-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-    }
-    
-    .certifications-container {
+        grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
     }
+    
+    .cert-image {
+        height: 140px;
+    }
+    
+    .cert-title {
+        font-size: 0.875rem;
+    }
 }
 
+/* Desktop - 4 columns */
 @media (min-width: 1024px) {
     .certifications-grid {
         grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+    }
+    
+    .cert-image {
+        height: 160px;
+    }
+    
+    .cert-title {
+        font-size: 0.875rem;
+    }
+    
+    .certifications-title {
+        font-size: 2rem;
     }
 }
 
@@ -1437,6 +1465,19 @@ onUnmounted(() => {
     
     .improvement-images {
         flex-direction: column;
+    }
+}
+
+/* Additional responsive padding for section container */
+@media (min-width: 768px) {
+    .section-container {
+        padding: 2.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .section-container {
+        padding: 3rem;
     }
 }
 </style>

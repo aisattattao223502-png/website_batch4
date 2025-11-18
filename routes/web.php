@@ -26,6 +26,9 @@ Route::prefix('admin/api')->name('admin.api.')->group(function () {
     Route::apiResource('services', AdminServiceController::class);
 });
 
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\DashboardController;
+
 Route::get('/visitors/get', [VisitorController::class, 'getCount']);
 Route::post('/visitors/increment', [VisitorController::class, 'incrementCount']);
 
@@ -88,10 +91,6 @@ Route::get('/awards-recognition', function () {
     return Inertia::render('Website/Explore/Awards');
 })->name('awards-recognition');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 // Sustainability page route
 Route::get('/sustainability', function () {
     return Inertia::render('Website/More/Sustainability');
@@ -136,11 +135,53 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/users/{user}', [AdminUsersController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])->name('users.destroy');
 });
+Route::get('/privacy-policy', function () {
+    return Inertia::render('Website/More/PrivacyPolicy');
+})->name('privacy-policy');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Login page (for UI preview only - no actual authentication)
+    Route::get('/login', function () {
+        return Inertia::render('Admin/AdminLogin');
+    })->name('login');
+    
+    // Dashboard - accessible without login for now
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('Admin/Dashboard');
+    
+    // Placeholder routes for other pages (we'll create these later)
+    Route::get('/products', function () {
+        return Inertia::render('Admin/Products');
+    })->name('products');
+    
+    Route::get('/industries', function () {
+        return Inertia::render('Admin/Industries');
+    })->name('industries');
+    
+    Route::get('/services', function () {
+        return Inertia::render('Admin/Services');
+    })->name('services');
+    
+    Route::get('/awards', function () {
+        return Inertia::render('Admin/Awards');
+    })->name('awards');
+    
+    Route::get('/customers', function () {
+        return Inertia::render('Admin/Customers');
+    })->name('customers');
+    
+    Route::get('/users', function () {
+        return Inertia::render('Admin/AdminUsers');
+    })->name('users');
+    
+    Route::get('/inquiries', function () {
+        return Inertia::render('Admin/Inquiries');
+    })->name('inquiries');
 });
 
 require __DIR__.'/auth.php';
