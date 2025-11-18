@@ -51,7 +51,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           <div
-            v-for="(award, index) in awards"
+            v-for="(award, index) in sortedAwards"
             :key="award.id"
             @click="openAwardModal(award)"
             data-aos="zoom-in"
@@ -239,7 +239,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import Header from '@/layouts/Header.vue';
 import Footer from '@/layouts/Footer.vue';
@@ -416,6 +416,18 @@ const awards = ref([
     image: 'AWARDS.avif'
   }
 ]);
+
+// Sort awards alphabetically by title, but keep "All Awards" at the end
+const sortedAwards = computed(() => {
+  const allAwardsItem = awards.value.find(award => award.title === 'All Awards');
+  const otherAwards = awards.value.filter(award => award.title !== 'All Awards');
+  
+  const sorted = otherAwards.sort((a, b) => {
+    return a.title.localeCompare(b.title);
+  });
+  
+  return allAwardsItem ? [...sorted, allAwardsItem] : sorted;
+});
 
 // Hardcoded Timeline Data from SQL
 const timeline = ref([

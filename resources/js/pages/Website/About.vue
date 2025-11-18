@@ -161,7 +161,7 @@
             </div>
 
             <!-- Logo -->
-            <div class="w-full lg:w-1/3 flex items-center justify-center py-6 lg:py-0" data-aos="fade-up">
+            <div class="w-full lg:w-1/2 flex items-center justify-center py-6 lg:py-0" data-aos="fade-up">
               <div class="bg-white p-5 sm:p-5 rounded-full shadow-lg border-4 sm:border-8 border-blue-600/10 overflow-hidden w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 flex items-center justify-center">
                 <img 
                   src="/storage/assets/img/header/logowhitebgfinal.png" 

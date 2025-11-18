@@ -57,14 +57,14 @@
         <!-- Quick Links -->
         <div class="lg:col-span-2">
           <h3 class="section-title">Quick Links</h3>
-          <ul class="space-y-3">
+          <ul class="grid grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-3">
             <li v-for="link in quickLinks" :key="link.url">
-              <a
+              <Link
                 :href="link.url"
-                class="link-hover text-gray-300 hover:text-white transition-colors duration-300 inline-block"
+                class="link-hover text-gray-300 hover:text-white transition-colors duration-300 inline-block text-sm sm:text-base"
               >
                 {{ link.text }}
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -72,14 +72,14 @@
         <!-- Explore -->
         <div class="lg:col-span-2">
           <h3 class="section-title">Explore</h3>
-          <ul class="space-y-3">
+          <ul class="grid grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-3">
             <li v-for="link in exploreLinks" :key="link.url">
-              <a
+              <Link
                 :href="link.url"
-                class="link-hover text-gray-300 hover:text-white transition-colors duration-300 inline-block"
+                class="link-hover text-gray-300 hover:text-white transition-colors duration-300 inline-block text-sm sm:text-base"
               >
                 {{ link.text }}
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -87,14 +87,14 @@
         <!-- Company -->
         <div class="lg:col-span-2">
           <h3 class="section-title">Company</h3>
-          <ul class="space-y-3">
+          <ul class="grid grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-3">
             <li v-for="link in companyLinks" :key="link.url">
-              <a
+              <Link
                 :href="link.url"
-                class="link-hover text-gray-300 hover:text-white transition-colors duration-300 inline-block"
+                class="link-hover text-gray-300 hover:text-white transition-colors duration-300 inline-block text-sm sm:text-base"
               >
                 {{ link.text }}
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -135,51 +135,70 @@
       <div class="section-divider my-8"></div>
 
       <!-- Bottom Footer -->
-      <div
-        class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"
-      >
-        <div class="text-center md:text-left">
-          <p class="text-gray-400 text-sm">
-            &copy; {{ currentYear }} James Golden Empire International. All Rights Reserved.
-          </p>
-        </div>
+<div
+  class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"
+>
+  <!-- Copyright and Back to Top combined for mobile -->
+  <div class="text-center md:text-left flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto justify-center md:justify-start">
+    <p class="text-gray-400 text-sm">
+      &copy; {{ currentYear }} James Golden Empire International. All Rights Reserved.
+    </p>
+    <a
+      href="#top"
+      class="inline-flex items-center text-gray-400 hover:text-white transition-colors duration-300 group text-sm md:hidden"
+    >
+      <span>Back to Top</span>
+      <i
+        class="fas fa-chevron-up ml-2 group-hover:-translate-y-1 transition-transform duration-300"
+      ></i>
+    </a>
+  </div>
 
-        <div class="flex flex-wrap justify-center gap-4 text-sm">
-          <a
-            href="https://www.privacy.gov.ph/data-privacy-act/"
-            target="_blank"
-            class="text-gray-400 hover:text-white transition-colors duration-300 link-hover"
-          >
-            Data Privacy Act
-          </a>
-          <span class="text-gray-600 hidden md:inline">|</span>
-          <a
-            href="https://www.officialgazette.gov.ph/2012/09/12/republic-act-no-10175/"
-            target="_blank"
-            class="text-gray-400 hover:text-white transition-colors duration-300 link-hover"
-          >
-            Cybercrime Prevention
-          </a>
-        </div>
+  <div class="flex flex-wrap justify-center gap-4 text-sm">
+    <Link
+      href="/privacy-policy"
+      class="text-gray-400 hover:text-white transition-colors duration-300 link-hover"
+    >
+      Privacy Policy
+    </Link>
+    <span class="text-gray-600 hidden md:inline">|</span>
+    <a
+      href="https://www.privacy.gov.ph/data-privacy-act/"
+      target="_blank"
+      class="text-gray-400 hover:text-white transition-colors duration-300 link-hover"
+    >
+      Data Privacy Act
+    </a>
+    <span class="text-gray-600 hidden md:inline">|</span>
+    <a
+      href="https://www.officialgazette.gov.ph/2012/09/12/republic-act-no-10175/"
+      target="_blank"
+      class="text-gray-400 hover:text-white transition-colors duration-300 link-hover"
+    >
+      Cybercrime Prevention
+    </a>
+  </div>
 
-        <div class="text-center md:text-right">
-          <a
-            href="#top"
-            class="inline-flex items-center text-gray-400 hover:text-white transition-colors duration-300 group text-sm"
-          >
-            <span>Back to Top</span>
-            <i
-              class="fas fa-chevron-up ml-2 group-hover:-translate-y-1 transition-transform duration-300"
-            ></i>
-          </a>
-        </div>
-      </div>
+  <!-- Back to Top - Desktop only, on the right side -->
+  <div class="hidden md:block text-right">
+    <a
+      href="#top"
+      class="inline-flex items-center text-gray-400 hover:text-white transition-colors duration-300 group text-sm"
+    >
+      <span>Back to Top</span>
+      <i
+        class="fas fa-chevron-up ml-2 group-hover:-translate-y-1 transition-transform duration-300"
+      ></i>
+    </a>
+  </div>
+</div>
     </div>
   </footer>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 
 const currentYear = computed(() => new Date().getFullYear());
 
@@ -233,6 +252,38 @@ const companyLinks = [
 </script>
 
 <style scoped>
+
+/* Add these new responsive styles */
+@media (max-width: 640px) {
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .footer-bg {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+
+/* Tablet breakpoint */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-12 > div {
+    padding: 0 1rem;
+  }
+}
+
+/* Ensure contact info is readable on all devices */
+.contact-info-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .contact-info-text {
+    font-size: 0.8125rem;
+  }
+}
+
 .footer-bg {
   background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.9)),
   url('/storage/assets/img/footer/bgg.jpg');

@@ -100,7 +100,7 @@
                   </Link>
                 </li>
                 <li>
-                  <Link href="/awards-recognition" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/awards" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     Awards
                   </Link>
                 </li>
