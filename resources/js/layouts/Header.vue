@@ -35,7 +35,7 @@
                   <span 
                     v-if="showMainText" 
                     :key="'main'"
-                    class="absolute inset-0 flex items-center"
+                    class="flex items-center whitespace-nowrap"
                   >
                     MANUFACTURING CORP.
                   </span>
