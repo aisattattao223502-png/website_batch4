@@ -359,6 +359,17 @@ const subheading = ref(
   "We're proud to partner with industry leaders across various sectors, providing them with high-performance polymer solutions."
 );
 
+// Add this to your Home.vue script setup section
+const props = defineProps({
+  products: {
+    type: Array,
+    default: () => []
+  },
+  services: {
+    type: Array,
+    default: () => []
+  }
+});
 const layout = ref([
   [ 1],
   [2, 3, null],

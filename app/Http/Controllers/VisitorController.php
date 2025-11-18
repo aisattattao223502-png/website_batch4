@@ -18,7 +18,7 @@ class VisitorController extends Controller
             file_put_contents($this->counterFile, '0');
         }
     }
-
+    
     public function getCount()
     {
         try {

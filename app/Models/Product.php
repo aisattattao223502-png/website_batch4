@@ -14,7 +14,8 @@ class Product extends Model
         'category',
         'image_url',
         'features',
-        'Cat'
+        'Cat',
+        'material_type' // Add this
     ];
 
     public function features()

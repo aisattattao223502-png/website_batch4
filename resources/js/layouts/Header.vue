@@ -90,23 +90,22 @@
                 class="dropdown-menu absolute left-0 top-full w-48 bg-white shadow-lg rounded-md py-2 z-[99999] border border-gray-200"
               >
                 <li>
-                  <Link href="/products" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/products" @click="closeDropdowns" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     Products
                   </Link>
                 </li>
                 <li>
-                  <Link href="/industries" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/industries" @click="closeDropdowns" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     Industries
                   </Link>
                 </li>
                 <li>
-                  <Link href="/awards-recognition" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/awards-recognition" @click="closeDropdowns" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     Awards
                   </Link>
                 </li>
               </ul>
             </li>
-
             <li>
               <Link
                 href="/contact"
@@ -369,13 +368,13 @@ const toggleDropdown = (dropdown, state) => {
   dropdowns.value[dropdown] = state;
 };
 
-const startTextTransition = () => {
-  // Toggle text every 4 seconds
-  textTransitionInterval = setInterval(() => {
-    showMainText.value = !showMainText.value;
-  }, 4000);
+const closeDropdowns = () => {
+  dropdowns.value.explore = false;
+  dropdowns.value.more = false;
 };
 
+const startTextTransition = () => {
+}
 const stopTextTransition = () => {
   if (textTransitionInterval) {
     clearInterval(textTransitionInterval);
