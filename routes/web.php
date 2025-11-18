@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +67,16 @@ Route::get('/faq', function () {
         'headerBg' => '/storage/assets/img/faq/hero-bg.jpg'
     ]);
 })->name('faq');
+
+//---------------------------------ADMIN---------------------------------//
+
+// Admin routes
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');
+    Route::post('/users', [AdminUsersController::class, 'store'])->name('users.store');
+    Route::put('/users/{user}', [AdminUsersController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])->name('users.destroy');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
