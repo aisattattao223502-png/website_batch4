@@ -18,14 +18,10 @@ use App\Http\Controllers\Admin\AwardController;
 use App\Http\Controllers\Admin\TimelineController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
-use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 
-// Visitor tracking
-// Visitor tracking routes
-
 use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
+
 
 /*
 |--------------------------------------------------------------------------
