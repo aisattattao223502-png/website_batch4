@@ -10,7 +10,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -90,28 +90,38 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         try {
+            Log::info('Product Store Request', [
+                'data' => $request->all()
+            ]);
+
             DB::beginTransaction();
 
             // Create product
-            $product = Product::create($request->only([
-                'name',
-                'description',
-                'category',
-                'material_type',
-                'image_url'
-            ]));
+            $product = Product::create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'category' => $request->category,
+                'material_type' => $request->material_type,
+                'image_url' => $request->image_url
+            ]);
+
+            Log::info('Product Created', ['product_id' => $product->id]);
 
             // Add features if provided
-            if ($request->has('features')) {
+            if ($request->has('features') && is_array($request->features)) {
                 foreach ($request->features as $feature) {
-                    ProductFeature::create([
-                        'product_id' => $product->id,
-                        'feature' => $feature
-                    ]);
+                    if (!empty(trim($feature))) {
+                        ProductFeature::create([
+                            'product_id' => $product->id,
+                            'feature' => trim($feature)
+                        ]);
+                    }
                 }
             }
 
             DB::commit();
+
+            Log::info('Product Store Success', ['product_id' => $product->id]);
 
             return response()->json([
                 'message' => 'Product created successfully',
@@ -120,6 +130,11 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            
+            Log::error('Product Store Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'message' => 'Failed to create product',
@@ -133,9 +148,15 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::with('features')->findOrFail($id);
-        
-        return new ProductResource($product);
+        try {
+            $product = Product::with('features')->findOrFail($id);
+            return new ProductResource($product);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Product not found',
+                'error' => $e->getMessage()
+            ], 404);
+        }
     }
 
     /**
@@ -144,18 +165,23 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, $id)
     {
         try {
+            Log::info('Product Update Request', [
+                'id' => $id,
+                'data' => $request->all()
+            ]);
+
             DB::beginTransaction();
 
             $product = Product::findOrFail($id);
             
             // Update product
-            $product->update($request->only([
-                'name',
-                'description',
-                'category',
-                'material_type',
-                'image_url'
-            ]));
+            $product->update([
+                'name' => $request->name ?? $product->name,
+                'description' => $request->description ?? $product->description,
+                'category' => $request->category ?? $product->category,
+                'material_type' => $request->material_type ?? $product->material_type,
+                'image_url' => $request->image_url ?? $product->image_url
+            ]);
 
             // Update features if provided
             if ($request->has('features')) {
@@ -163,15 +189,21 @@ class ProductController extends Controller
                 ProductFeature::where('product_id', $product->id)->delete();
                 
                 // Add new features
-                foreach ($request->features as $feature) {
-                    ProductFeature::create([
-                        'product_id' => $product->id,
-                        'feature' => $feature
-                    ]);
+                if (is_array($request->features)) {
+                    foreach ($request->features as $feature) {
+                        if (!empty(trim($feature))) {
+                            ProductFeature::create([
+                                'product_id' => $product->id,
+                                'feature' => trim($feature)
+                            ]);
+                        }
+                    }
                 }
             }
 
             DB::commit();
+
+            Log::info('Product Update Success', ['product_id' => $product->id]);
 
             return response()->json([
                 'message' => 'Product updated successfully',
@@ -180,6 +212,12 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            
+            Log::error('Product Update Failed', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
             return response()->json([
                 'message' => 'Failed to update product',
@@ -202,11 +240,18 @@ class ProductController extends Controller
             // Delete product
             $product->delete();
 
+            Log::info('Product Deleted', ['product_id' => $id]);
+
             return response()->json([
                 'message' => 'Product deleted successfully'
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Product Delete Failed', [
+                'id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            
             return response()->json([
                 'message' => 'Failed to delete product',
                 'error' => $e->getMessage()
@@ -232,6 +277,8 @@ class ProductController extends Controller
 
             DB::commit();
 
+            Log::info('Bulk Delete Success', ['count' => count($request->ids)]);
+
             return response()->json([
                 'message' => count($request->ids) . ' products deleted successfully'
             ]);
@@ -239,36 +286,12 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             
+            Log::error('Bulk Delete Failed', [
+                'error' => $e->getMessage()
+            ]);
+            
             return response()->json([
                 'message' => 'Failed to delete products',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Upload product image
-     */
-    public function uploadImage(Request $request)
-    {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
-        try {
-            $image = $request->file('image');
-            $filename = time() . '_' . $image->getClientOriginalName();
-            $path = $image->storeAs('products', $filename, 'public');
-
-            return response()->json([
-                'message' => 'Image uploaded successfully',
-                'url' => Storage::url($path),
-                'path' => $path
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to upload image',
                 'error' => $e->getMessage()
             ], 500);
         }

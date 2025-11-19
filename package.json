@@ -38,6 +38,7 @@
     "dependencies": {
         "@inertiajs/vue3": "^2.1.0",
         "@vueuse/core": "^12.8.2",
+        "@vueuse/head": "^2.0.0",
         "aos": "^2.3.4",
         "chart.js": "^4.5.1",
         "class-variance-authority": "^0.7.1",

@@ -3,32 +3,16 @@
 use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\IndustryController;
-use App\Http\Controllers\NewsEventController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
-
-// Admin Products Page (Inertia) - REMOVED AUTH MIDDLEWARE FOR TESTING
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/products', [AdminProductController::class, 'indexPage'])->name('products.index');
-});
-
-// Admin API Routes - REMOVED AUTH MIDDLEWARE FOR TESTING
-Route::prefix('admin/api')->name('admin.api.')->group(function () {
-    Route::apiResource('products', AdminProductController::class);
-    Route::post('products/bulk-destroy', [AdminProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');
-    Route::post('products/upload-image', [AdminProductController::class, 'uploadImage'])->name('products.upload-image');
-    Route::apiResource('services', AdminServiceController::class);
-});
-
-use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AuthController;
 
+// Visitor tracking
 Route::get('/visitors/get', [VisitorController::class, 'getCount']);
 Route::post('/visitors/increment', [VisitorController::class, 'incrementCount']);
 
@@ -98,67 +82,30 @@ Route::get('/sustainability', function () {
 
 // FAQ page route
 Route::get('/faq', function () {
-    return Inertia::render('Website/More/FAQ', [
-        'faqs' => [
-            [
-                'id' => 1,
-                'question' => 'What types of plastic injection molding do you offer?',
-                'answer' => 'We offer a comprehensive range of plastic injection molding services including thermoplastic injection, insert molding, overmolding, and multi-shot molding. Our state-of-the-art facilities can handle projects from prototype to high-volume production.'
-            ],
-            [
-                'id' => 2,
-                'question' => 'What quality certifications does James Polymers hold?',
-                'answer' => 'James Polymers is ISO 9001:2015 certified for quality management, ISO 14001:2015 for environmental management, and IATF 16949 certified for automotive quality management. We maintain rigorous quality control standards across all our manufacturing processes.'
-            ],
-            [
-                'id' => 3,
-                'question' => 'What is your typical lead time for production?',
-                'answer' => 'Lead times vary depending on project complexity and volume. For standard orders, typical lead times range from 2-4 weeks. We also offer expedited services for urgent requirements. Contact our team for specific timeline estimates for your project.'
-            ],
-            [
-                'id' => 4,
-                'question' => 'Do you provide custom mold design services?',
-                'answer' => 'Yes, we have an experienced in-house design team that specializes in custom mold design and development. We use advanced CAD/CAM software and work closely with clients to optimize designs for manufacturability and cost-effectiveness.'
-            ],
-        ],
-        'headerTitle' => 'Frequently Asked Questions',
-        'headerBg' => '/storage/assets/img/faq/hero-bg.jpg'
-    ]);
+    return Inertia::render('Website/More/FAQ');
 })->name('faq');
 
-//---------------------------------ADMIN---------------------------------//
-
-// Admin routes
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');
-    Route::post('/users', [AdminUsersController::class, 'store'])->name('users.store');
-    Route::put('/users/{user}', [AdminUsersController::class, 'update'])->name('users.update');
-    Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])->name('users.destroy');
-});
+// Privacy Policy
 Route::get('/privacy-policy', function () {
     return Inertia::render('Website/More/PrivacyPolicy');
 })->name('privacy-policy');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+//---------------------------------ADMIN ROUTES---------------------------------//
 
+// Admin Authentication Routes
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Login page (for UI preview only - no actual authentication)
+    // Login page
     Route::get('/login', function () {
         return Inertia::render('Admin/AdminLogin');
     })->name('login');
     
-    // Dashboard - accessible without login for now
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('Admin/Dashboard');
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Placeholder routes for other pages (we'll create these later)
-    Route::get('/products', function () {
-        return Inertia::render('Admin/Products');
-    })->name('products');
+    // Products Management (Inertia Page)
+    Route::get('/products', [AdminProductController::class, 'indexPage'])->name('products.index');
     
+    // Other admin pages (placeholders)
     Route::get('/industries', function () {
         return Inertia::render('Admin/Industries');
     })->name('industries');
@@ -175,13 +122,40 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return Inertia::render('Admin/Customers');
     })->name('customers');
     
-    Route::get('/users', function () {
-        return Inertia::render('Admin/AdminUsers');
-    })->name('users');
+    Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');
     
     Route::get('/inquiries', function () {
         return Inertia::render('Admin/Inquiries');
     })->name('inquiries');
+});
+
+// Admin API Routes (for AJAX operations)
+Route::prefix('admin/api')->name('admin.api.')->group(function () {
+    // Product API endpoints
+    Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
+    Route::post('/products', [AdminProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{id}', [AdminProductController::class, 'show'])->name('products.show');
+    Route::put('/products/{id}', [AdminProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{id}', [AdminProductController::class, 'destroy'])->name('products.destroy');
+    Route::post('/products/bulk-destroy', [AdminProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');
+    Route::post('/products/upload-image', [AdminProductController::class, 'uploadImage'])->name('products.upload-image');
+    
+    // Service API endpoints
+    Route::apiResource('services', AdminServiceController::class);
+});
+
+// Admin User Management
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::post('/users', [AdminUsersController::class, 'store'])->name('users.store');
+    Route::put('/users/{user}', [AdminUsersController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])->name('users.destroy');
+});
+
+// Profile routes (if needed)
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';

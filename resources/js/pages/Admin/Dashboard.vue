@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
 import AdminLayout from '@/layouts/Admin/AdminLayout.vue';
 import StatsCard from '@/components/Admin/Dashboard/StatsCard.vue';
 import ChartCard from '@/components/Admin/Dashboard/ChartCard.vue';
@@ -33,7 +34,8 @@ const statsCards = computed(() => [
         icon: 'fa-box',
         bgColor: 'bg-blue-100',
         iconColor: 'text-blue-500',
-        textColor: 'text-blue-800'
+        textColor: 'text-blue-800',
+        link: '/admin/products'
     },
     {
         label: 'Industries',
@@ -41,7 +43,8 @@ const statsCards = computed(() => [
         icon: 'fa-industry',
         bgColor: 'bg-green-100',
         iconColor: 'text-green-500',
-        textColor: 'text-green-800'
+        textColor: 'text-green-800',
+        link: '/admin/industries'
     },
     {
         label: 'Services',
@@ -49,7 +52,8 @@ const statsCards = computed(() => [
         icon: 'fa-cogs',
         bgColor: 'bg-purple-100',
         iconColor: 'text-purple-500',
-        textColor: 'text-purple-800'
+        textColor: 'text-purple-800',
+        link: '/admin/services'
     },
     {
         label: 'Visitors',
@@ -64,9 +68,9 @@ const statsCards = computed(() => [
 // Quick actions configuration
 const quickActions = [
     {
-        label: 'Add Product',
-        href: '/admin/products/create',
-        icon: 'fa-plus',
+        label: 'Manage Products',
+        href: '/admin/products',
+        icon: 'fa-box',
         bgColor: 'bg-blue-50',
         hoverColor: 'hover:bg-blue-100',
         iconBg: 'bg-blue-100',
@@ -135,15 +139,20 @@ const formatDate = (date) => {
 
         <!-- Stats Cards Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <StatsCard
-                v-for="(stat, index) in statsCards"
+            <Link 
+                v-for="(stat, index) in statsCards" 
                 :key="index"
-                :label="stat.label"
-                :value="stat.value"
-                :icon="stat.icon"
-                :bg-color="stat.bgColor"
-                :icon-color="stat.iconColor"
-            />
+                :href="stat.link || '#'"
+                :class="stat.link ? 'cursor-pointer hover:scale-105 transition-transform' : ''"
+            >
+                <StatsCard
+                    :label="stat.label"
+                    :value="stat.value"
+                    :icon="stat.icon"
+                    :bg-color="stat.bgColor"
+                    :icon-color="stat.iconColor"
+                />
+            </Link>
         </div>
 
         <!-- Charts & Tables Row -->
@@ -159,12 +168,12 @@ const formatDate = (date) => {
                 <div class="p-4 sm:p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-gray-800">Recent Products</h3>
-                        <a
+                        <Link
                             href="/admin/products"
                             class="text-primary hover:text-secondary text-sm font-medium transition-colors duration-200"
                         >
                             View All
-                        </a>
+                        </Link>
                     </div>
 
                     <!-- Mobile: Card Layout -->
@@ -202,13 +211,13 @@ const formatDate = (date) => {
                         <div v-if="recentProducts.length === 0" class="py-12 text-center">
                             <i class="fas fa-box-open text-gray-300 text-5xl mb-3"></i>
                             <p class="text-gray-500 font-medium mb-2">No products found</p>
-                            <a
-                                href="/admin/products/create"
+                            <Link
+                                href="/admin/products"
                                 class="text-primary hover:text-secondary text-sm inline-flex items-center"
                             >
                                 <i class="fas fa-plus mr-1"></i>
                                 Add your first product
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
@@ -257,13 +266,13 @@ const formatDate = (date) => {
                                     <td colspan="3" class="py-12 text-center">
                                         <i class="fas fa-box-open text-gray-300 text-5xl mb-3"></i>
                                         <p class="text-gray-500 font-medium mb-2">No products found</p>
-                                        <a
-                                            href="/admin/products/create"
+                                        <Link
+                                            href="/admin/products"
                                             class="text-primary hover:text-secondary text-sm inline-flex items-center"
                                         >
                                             <i class="fas fa-plus mr-1"></i>
                                             Add your first product
-                                        </a>
+                                        </Link>
                                     </td>
                                 </tr>
                             </tbody>
