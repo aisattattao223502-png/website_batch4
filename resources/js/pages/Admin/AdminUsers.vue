@@ -1,7 +1,5 @@
 <template>
   <div>
-    <AdminSidebar />
-    
     <!-- Main Content -->
     <div class="admin-content min-h-screen transition-all duration-300">
       <div class="mb-6">
@@ -294,12 +292,13 @@
       </div>
     </div>
   </div>
+  <AdminLayout/>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import AdminSidebar from '@/layouts/AdminSidebar.vue';
+import AdminLayout from '@/layouts/Admin/AdminLayout.vue';
 
 // Props from Inertia
 const props = defineProps({

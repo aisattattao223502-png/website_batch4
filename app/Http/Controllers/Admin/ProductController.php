@@ -3,274 +3,132 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\ProductFeature;
-use App\Http\Requests\StoreProductRequest;
-use App\Http\Requests\UpdateProductRequest;
-use App\Http\Resources\ProductResource;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductController extends Controller
 {
     /**
-     * Display the admin products page (Inertia)
+     * Display a listing of products
      */
-    public function indexPage(Request $request)
+    public function index()
     {
-        $query = Product::with('features');
-
-        // Filtering
-        if ($request->has('category')) {
-            $query->where('category', $request->category);
-        }
-
-        if ($request->has('material_type')) {
-            $query->where('material_type', $request->material_type);
-        }
-
-        // Search
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
-        $query->orderBy($sortBy, $sortOrder);
-
-        // Pagination
-        $perPage = $request->get('per_page', 15);
-        $products = $query->paginate($perPage);
+        // Sample products data - replace with database queries later
+        $products = [
+            [
+                'id' => 1,
+                'name' => 'Polypropylene Compound',
+                'description' => 'High-quality polypropylene compound suitable for various industrial applications. Excellent chemical resistance and durability.',
+                'category' => 'thermoplastic',
+                'image_url' => 'storage/products/sample1.jpg',
+                'created_at' => '2024-11-15 10:30:00',
+            ],
+            [
+                'id' => 2,
+                'name' => 'ABS Automotive Grade',
+                'description' => 'Premium ABS material specifically designed for automotive applications with superior impact resistance.',
+                'category' => 'automotive',
+                'image_url' => 'storage/products/sample2.jpg',
+                'created_at' => '2024-11-14 14:20:00',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Engineering Plastic Compound',
+                'description' => 'Advanced engineering plastic for high-performance applications requiring excellent mechanical properties.',
+                'category' => 'engineering',
+                'image_url' => 'storage/products/sample3.jpg',
+                'created_at' => '2024-11-13 09:15:00',
+            ],
+            [
+                'id' => 4,
+                'name' => 'Custom TPE Material',
+                'description' => 'Customized thermoplastic elastomer with tailored properties for specific customer requirements.',
+                'category' => 'custom',
+                'image_url' => 'storage/products/sample4.jpg',
+                'created_at' => '2024-11-12 16:45:00',
+            ],
+            [
+                'id' => 5,
+                'name' => 'Appliance Housing Material',
+                'description' => 'Specialized material for appliance housings with excellent heat resistance and aesthetic finish.',
+                'category' => 'appliance',
+                'image_url' => 'storage/products/sample5.jpg',
+                'created_at' => '2024-11-11 11:00:00',
+            ],
+            [
+                'id' => 6,
+                'name' => 'Industrial Grade Polymer',
+                'description' => 'Heavy-duty industrial polymer designed for demanding manufacturing environments.',
+                'category' => 'industrial',
+                'image_url' => 'storage/products/sample6.jpg',
+                'created_at' => '2024-11-10 13:30:00',
+            ],
+        ];
 
         return Inertia::render('Admin/AdminProducts', [
-            'products' => ProductResource::collection($products),
-            'filters' => $request->only(['category', 'material_type', 'search'])
+            'products' => $products,
+            'success' => session('success'),
+            'error' => session('error'),
         ]);
     }
 
     /**
-     * Display a listing of products (API)
+     * Show the form for creating a new product
      */
-    public function index(Request $request)
+    public function create()
     {
-        $query = Product::with('features');
-
-        // Filtering
-        if ($request->has('category')) {
-            $query->where('category', $request->category);
-        }
-
-        if ($request->has('material_type')) {
-            $query->where('material_type', $request->material_type);
-        }
-
-        // Search
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
-        $query->orderBy($sortBy, $sortOrder);
-
-        // Pagination
-        $perPage = $request->get('per_page', 15);
-        $products = $query->paginate($perPage);
-
-        return ProductResource::collection($products);
+        return Inertia::render('Admin/AdminProducts', [
+            'action' => 'create',
+            'product' => null,
+        ]);
     }
 
     /**
-     * Store a newly created product
+     * Show the form for editing a product
      */
-    public function store(StoreProductRequest $request)
+    public function edit($id)
     {
-        try {
-            DB::beginTransaction();
+        // Sample product data for editing - replace with database query later
+        $product = [
+            'id' => $id,
+            'name' => 'Sample Product',
+            'description' => 'This is a sample product description.',
+            'category' => 'thermoplastic',
+            'image_url' => 'storage/products/sample.jpg',
+        ];
 
-            // Create product
-            $product = Product::create($request->only([
-                'name',
-                'description',
-                'category',
-                'material_type',
-                'image_url'
-            ]));
-
-            // Add features if provided
-            if ($request->has('features')) {
-                foreach ($request->features as $feature) {
-                    ProductFeature::create([
-                        'product_id' => $product->id,
-                        'feature' => $feature
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Product created successfully',
-                'data' => new ProductResource($product->load('features'))
-            ], 201);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            return response()->json([
-                'message' => 'Failed to create product',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return Inertia::render('Admin/Products', [
+            'action' => 'edit',
+            'product' => $product,
+        ]);
     }
 
     /**
-     * Display the specified product
+     * Store a newly created product (placeholder for future)
      */
-    public function show($id)
+    public function store()
     {
-        $product = Product::with('features')->findOrFail($id);
-        
-        return new ProductResource($product);
+        // This will be implemented when connecting to database
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Product added successfully!');
     }
 
     /**
-     * Update the specified product
+     * Update the specified product (placeholder for future)
      */
-    public function update(UpdateProductRequest $request, $id)
+    public function update($id)
     {
-        try {
-            DB::beginTransaction();
-
-            $product = Product::findOrFail($id);
-            
-            // Update product
-            $product->update($request->only([
-                'name',
-                'description',
-                'category',
-                'material_type',
-                'image_url'
-            ]));
-
-            // Update features if provided
-            if ($request->has('features')) {
-                // Delete old features
-                ProductFeature::where('product_id', $product->id)->delete();
-                
-                // Add new features
-                foreach ($request->features as $feature) {
-                    ProductFeature::create([
-                        'product_id' => $product->id,
-                        'feature' => $feature
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Product updated successfully',
-                'data' => new ProductResource($product->load('features'))
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            return response()->json([
-                'message' => 'Failed to update product',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        // This will be implemented when connecting to database
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Product updated successfully!');
     }
 
     /**
-     * Remove the specified product
+     * Remove the specified product (placeholder for future)
      */
     public function destroy($id)
     {
-        try {
-            $product = Product::findOrFail($id);
-            
-            // Delete associated features (will cascade if foreign key is set)
-            ProductFeature::where('product_id', $product->id)->delete();
-            
-            // Delete product
-            $product->delete();
-
-            return response()->json([
-                'message' => 'Product deleted successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to delete product',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Bulk delete products
-     */
-    public function bulkDestroy(Request $request)
-    {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:products,id'
-        ]);
-
-        try {
-            DB::beginTransaction();
-
-            ProductFeature::whereIn('product_id', $request->ids)->delete();
-            Product::whereIn('id', $request->ids)->delete();
-
-            DB::commit();
-
-            return response()->json([
-                'message' => count($request->ids) . ' products deleted successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            return response()->json([
-                'message' => 'Failed to delete products',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Upload product image
-     */
-    public function uploadImage(Request $request)
-    {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
-        try {
-            $image = $request->file('image');
-            $filename = time() . '_' . $image->getClientOriginalName();
-            $path = $image->storeAs('products', $filename, 'public');
-
-            return response()->json([
-                'message' => 'Image uploaded successfully',
-                'url' => Storage::url($path),
-                'path' => $path
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to upload image',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        // This will be implemented when connecting to database
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Product deleted successfully!');
     }
 }
