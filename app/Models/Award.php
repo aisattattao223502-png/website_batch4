@@ -5,19 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Industry extends Model
+class Award extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'title',
         'description',
-        'image_url',
-        'icon_class',
-        'coming_soon',
-    ];
-
-    protected $casts = [
-        'coming_soon' => 'boolean',
+        'image',
+        'year',
+        'icon',
     ];
 }

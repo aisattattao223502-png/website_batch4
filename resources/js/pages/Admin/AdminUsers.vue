@@ -1,6 +1,7 @@
 <template>
-  <AdminLayout>
-    <div class="min-h-screen">
+  <div>
+    <!-- Main Content -->
+    <div class="admin-content min-h-screen transition-all duration-300">
       <div class="mb-6">
         <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Manage Admin Users</h1>
         <p class="text-xs sm:text-sm text-gray-600">Create, edit, and manage administrator accounts</p>
@@ -284,12 +285,12 @@
       </div>
     </div>
   </div>
+  <AdminLayout/>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-// CHANGED: Use AdminLayout instead of AdminSidebar
 import AdminLayout from '@/layouts/Admin/AdminLayout.vue';
 
 // Props from Inertia

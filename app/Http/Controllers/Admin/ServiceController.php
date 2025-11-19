@@ -6,86 +6,91 @@ use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+
 
 class ServiceController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Service::query();
+        $services = Service::orderBy('name', 'asc')->get();
+        
+        return Inertia::render('Admin/AdminServices', [
+            'services' => $services,
+            'mode' => 'list',
+        ]);
+    }
 
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
-        $query->orderBy($sortBy, $sortOrder);
-
-        $perPage = $request->get('per_page', 15);
-        $services = $query->paginate($perPage);
-
-        return response()->json($services);
+    public function create()
+    {
+        return Inertia::render('Admin/AdminServices', [
+            'services' => [],
+            'mode' => 'create',
+        ]);
     }
 
     public function store(StoreServiceRequest $request)
     {
-        try {
-            $service = Service::create($request->validated());
-
-            return response()->json([
-                'message' => 'Service created successfully',
-                'data' => $service
-            ], 201);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to create service',
-                'error' => $e->getMessage()
-            ], 500);
+        $validated = $request->validated();
+        
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->storeAs('assets', $filename, 'public');
+            $validated['image_url'] = $filename;
         }
+        
+        Service::create($validated);
+        
+        return redirect()->route('admin.services.index')
+            ->with('success', 'Service added successfully!');
     }
 
-    public function show($id)
+    public function edit(Service $service)
     {
-        $service = Service::findOrFail($id);
-        return response()->json($service);
+        return Inertia::render('Admin/AdminServices', [
+            'services' => [],
+            'service' => $service,
+            'mode' => 'edit',
+        ]);
     }
 
-    public function update(UpdateServiceRequest $request, $id)
+    public function update(UpdateServiceRequest $request, Service $service)
     {
-        try {
-            $service = Service::findOrFail($id);
-            $service->update($request->validated());
-
-            return response()->json([
-                'message' => 'Service updated successfully',
-                'data' => $service
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to update service',
-                'error' => $e->getMessage()
-            ], 500);
+        $validated = $request->validated();
+        
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($service->image_url) {
+                Storage::disk('public')->delete('assets/' . $service->image_url);
+            }
+            
+            $image = $request->file('image');
+            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->storeAs('assets', $filename, 'public');
+            $validated['image_url'] = $filename;
         }
+        
+        $service->update($validated);
+        
+        return redirect()->route('admin.services.index')
+            ->with('success', 'Service updated successfully!');
     }
 
-    public function destroy($id)
+    public function destroy(Service $service)
     {
-        try {
-            $service = Service::findOrFail($id);
-            $service->delete();
-
-            return response()->json([
-                'message' => 'Service deleted successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to delete service',
-                'error' => $e->getMessage()
-            ], 500);
+        // Delete image if exists
+        if ($service->image_url) {
+            Storage::disk('public')->delete('assets/' . $service->image_url);
         }
+        
+        $service->delete();
+        
+        return redirect()->route('admin.services.index')
+            ->with('success', 'Service deleted successfully!');
     }
 }
