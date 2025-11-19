@@ -1,15 +1,11 @@
 <template>
-  <div>
-    <AdminSidebar />
-    
-    <!-- Main Content -->
-    <div class="admin-content min-h-screen transition-all duration-300">
+  <AdminLayout>
+    <div class="min-h-screen">
       <div class="mb-6">
         <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Manage Admin Users</h1>
         <p class="text-xs sm:text-sm text-gray-600">Create, edit, and manage administrator accounts</p>
       </div>
       
-      <!-- Action Buttons -->
       <div class="mb-6 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
         <div class="w-full sm:w-auto">
           <button 
@@ -30,9 +26,7 @@
         </div>
       </div>
       
-      <!-- Users Table -->
       <div class="bg-white rounded-md shadow-md overflow-hidden">
-        <!-- Mobile Card View -->
         <div class="block lg:hidden">
           <div 
             v-for="user in filteredUsers" 
@@ -83,7 +77,6 @@
           </div>
         </div>
         
-        <!-- Desktop Table View -->
         <div class="hidden lg:block overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -142,7 +135,6 @@
         </div>
       </div>
       
-      <!-- Pagination -->
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
         <div class="text-xs sm:text-sm text-gray-700 order-2 sm:order-1">
           Showing <span class="font-medium">{{ pagination.from }}</span> to 
@@ -178,118 +170,116 @@
         </div>
       </div>
     </div>
+  </AdminLayout>
 
-    <!-- Add/Edit User Modal -->
-    <div 
-      v-if="showUserModal" 
-      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
-      @click.self="closeUserModal"
-    >
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
-        <div class="flex justify-between items-center border-b p-4">
-          <h3 class="text-lg font-bold text-gray-900">{{ isEditing ? 'Edit Admin User' : 'Add New Admin User' }}</h3>
-          <button @click="closeUserModal" class="text-gray-400 hover:text-gray-500">
-            <i class="fas fa-times"></i>
+  <div 
+    v-if="showUserModal" 
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    @click.self="closeUserModal"
+  >
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+      <div class="flex justify-between items-center border-b p-4">
+        <h3 class="text-lg font-bold text-gray-900">{{ isEditing ? 'Edit Admin User' : 'Add New Admin User' }}</h3>
+        <button @click="closeUserModal" class="text-gray-400 hover:text-gray-500">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form @submit.prevent="submitUserForm">
+        <div class="p-4">
+          <div class="mb-4">
+            <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+            <input 
+              v-model="form.name" 
+              type="text" 
+              id="name" 
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+            >
+            <span v-if="form.errors.name" class="text-red-500 text-xs">{{ form.errors.name }}</span>
+          </div>
+          
+          <div class="mb-4">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+            <input 
+              v-model="form.email" 
+              type="email" 
+              id="email" 
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+            >
+            <span v-if="form.errors.email" class="text-red-500 text-xs">{{ form.errors.email }}</span>
+          </div>
+          
+          <div class="mb-4">
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input 
+              v-model="form.password" 
+              type="password" 
+              id="password" 
+              :required="!isEditing"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+            >
+            <p class="text-xs text-gray-500 mt-1">{{ isEditing ? 'Leave empty to keep current password' : 'Minimum 8 characters' }}</p>
+            <span v-if="form.errors.password" class="text-red-500 text-xs">{{ form.errors.password }}</span>
+          </div>
+          
+          <div class="mb-4">
+            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+            <select 
+              v-model="form.is_active" 
+              id="status" 
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
+            >
+              <option :value="1">Active</option>
+              <option :value="0">Inactive</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 px-4 py-3 flex justify-end space-x-3 rounded-b-lg">
+          <button 
+            type="button" 
+            @click="closeUserModal" 
+            class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            :disabled="form.processing"
+            class="bg-primary py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-800 disabled:opacity-50"
+          >
+            {{ form.processing ? 'Saving...' : 'Save User' }}
           </button>
         </div>
-        <form @submit.prevent="submitUserForm">
-          <div class="p-4">
-            <div class="mb-4">
-              <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-              <input 
-                v-model="form.name" 
-                type="text" 
-                id="name" 
-                required
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
-              >
-              <span v-if="form.errors.name" class="text-red-500 text-xs">{{ form.errors.name }}</span>
-            </div>
-            
-            <div class="mb-4">
-              <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-              <input 
-                v-model="form.email" 
-                type="email" 
-                id="email" 
-                required
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
-              >
-              <span v-if="form.errors.email" class="text-red-500 text-xs">{{ form.errors.email }}</span>
-            </div>
-            
-            <div class="mb-4">
-              <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-              <input 
-                v-model="form.password" 
-                type="password" 
-                id="password" 
-                :required="!isEditing"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
-              >
-              <p class="text-xs text-gray-500 mt-1">{{ isEditing ? 'Leave empty to keep current password' : 'Minimum 8 characters' }}</p>
-              <span v-if="form.errors.password" class="text-red-500 text-xs">{{ form.errors.password }}</span>
-            </div>
-            
-            <div class="mb-4">
-              <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-              <select 
-                v-model="form.is_active" 
-                id="status" 
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary focus:border-primary"
-              >
-                <option :value="1">Active</option>
-                <option :value="0">Inactive</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="bg-gray-50 px-4 py-3 flex justify-end space-x-3 rounded-b-lg">
-            <button 
-              type="button" 
-              @click="closeUserModal" 
-              class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              :disabled="form.processing"
-              class="bg-primary py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-800 disabled:opacity-50"
-            >
-              {{ form.processing ? 'Saving...' : 'Save User' }}
-            </button>
-          </div>
-        </form>
-      </div>
+      </form>
     </div>
+  </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div 
-      v-if="showDeleteModal" 
-      class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
-      @click.self="closeDeleteModal"
-    >
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
-        <div class="p-6">
-          <h3 class="text-lg font-bold text-gray-900 mb-4">Confirm Deletion</h3>
-          <p class="text-gray-700">Are you sure you want to delete <strong>{{ userToDelete?.name }}</strong>? This action cannot be undone.</p>
-          
-          <div class="mt-6 flex justify-end space-x-3">
-            <button 
-              @click="closeDeleteModal" 
-              class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button 
-              @click="confirmDelete" 
-              :disabled="deleteForm.processing"
-              class="bg-red-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
-            >
-              {{ deleteForm.processing ? 'Deleting...' : 'Delete User' }}
-            </button>
-          </div>
+  <div 
+    v-if="showDeleteModal" 
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    @click.self="closeDeleteModal"
+  >
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
+      <div class="p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Confirm Deletion</h3>
+        <p class="text-gray-700">Are you sure you want to delete <strong>{{ userToDelete?.name }}</strong>? This action cannot be undone.</p>
+        
+        <div class="mt-6 flex justify-end space-x-3">
+          <button 
+            @click="closeDeleteModal" 
+            class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button 
+            @click="confirmDelete" 
+            :disabled="deleteForm.processing"
+            class="bg-red-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+          >
+            {{ deleteForm.processing ? 'Deleting...' : 'Delete User' }}
+          </button>
         </div>
       </div>
     </div>
@@ -299,7 +289,8 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import AdminSidebar from '@/layouts/AdminSidebar.vue';
+// CHANGED: Use AdminLayout instead of AdminSidebar
+import AdminLayout from '@/layouts/Admin/AdminLayout.vue';
 
 // Props from Inertia
 const props = defineProps({
@@ -459,24 +450,10 @@ const changePage = (page) => {
 </script>
 
 <style scoped>
-.admin-content {
-  transition: margin-left 0.3s ease;
-  padding: 1rem;
-}
-
-@media (min-width: 768px) {
-  .admin-content {
-    padding: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .admin-content {
-    margin-left: 16rem;
-    padding: 1.5rem;
-  }
-}
-
+/* 2. REMOVED: The custom .admin-content margin styles 
+     are now handled by AdminLayout.vue (Main Content Area div class="lg:ml-64").
+     The following is kept for custom styling:
+*/
 .bg-primary {
   background-color: #0f4c81;
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -9,10 +10,11 @@ use Inertia\Inertia;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\DashboardController;
 
 // Visitor tracking
+// Visitor tracking routes
 Route::get('/visitors/get', [VisitorController::class, 'getCount']);
 Route::post('/visitors/increment', [VisitorController::class, 'incrementCount']);
 
@@ -75,6 +77,10 @@ Route::get('/awards-recognition', function () {
     return Inertia::render('Website/Explore/Awards');
 })->name('awards-recognition');
 
+// Contact routes
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact/submit', [ContactController::class, 'submit'])->name('contact.submit');
+
 // Sustainability page route
 Route::get('/sustainability', function () {
     return Inertia::render('Website/More/Sustainability');
@@ -86,6 +92,7 @@ Route::get('/faq', function () {
 })->name('faq');
 
 // Privacy Policy
+// Privacy Policy page route
 Route::get('/privacy-policy', function () {
     return Inertia::render('Website/More/PrivacyPolicy');
 })->name('privacy-policy');
@@ -93,6 +100,16 @@ Route::get('/privacy-policy', function () {
 //---------------------------------ADMIN ROUTES---------------------------------//
 
 // Admin Authentication Routes
+// Authenticated user profile routes
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+//---------------------------------ADMIN SECTION---------------------------------//
+
+// Admin Authentication & Dashboard
 Route::prefix('admin')->name('admin.')->group(function () {
     // Login page
     Route::get('/login', function () {
@@ -106,6 +123,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/products', [AdminProductController::class, 'indexPage'])->name('products.index');
     
     // Other admin pages (placeholders)
+    // Admin Users Management
+    Route::get('/users', [AdminUsersController::class, 'index'])->name('users.index');
+    Route::post('/users', [AdminUsersController::class, 'store'])->name('users.store');
+    Route::put('/users/{user}', [AdminUsersController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [AdminUsersController::class, 'destroy'])->name('users.destroy');
+    
+    // Admin Products Page
+    Route::get('/products', [AdminProductController::class, 'indexPage'])->name('products.index');
+    
+    // Placeholder routes for other admin pages
     Route::get('/industries', function () {
         return Inertia::render('Admin/Industries');
     })->name('industries');
@@ -156,6 +183,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Admin API Routes
+Route::prefix('admin/api')->name('admin.api.')->group(function () {
+    Route::apiResource('products', AdminProductController::class);
+    Route::post('products/bulk-destroy', [AdminProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');
+    Route::post('products/upload-image', [AdminProductController::class, 'uploadImage'])->name('products.upload-image');
+    Route::apiResource('services', AdminServiceController::class);
 });
 
 require __DIR__.'/auth.php';
