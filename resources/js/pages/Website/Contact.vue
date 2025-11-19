@@ -1,5 +1,6 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import Header from '@/layouts/Header.vue';
 import Footer from '@/layouts/Footer.vue';
 import Chatbot from '@/layouts/Chatbot.vue';
@@ -22,14 +23,39 @@ const props = defineProps({
         description: 'Our technical sales team is available to help you select the right polymer solution for your application.',
         button_text: 'View Products',
         background_image: '/storage/assets/img/banners/contact_cta.jpg'
-      },
-      google_form_url: 'https://forms.gle/Hn4KY5cUWcA8HiP8A'
+      }
     })
+  },
+  success: {
+    type: String,
+    default: ''
+  },
+  error: {
+    type: String,
+    default: ''
   }
 });
 
-const openGoogleForm = () => {
-  window.open(props.content.google_form_url, '_blank');
+// Contact form
+const contactForm = useForm({
+  fullName: '',
+  email: '',
+  phone: '',
+  companyName: '',
+  position: '',
+  companyAddress: '',
+  subject: '',
+  priority: '',
+  message: ''
+});
+
+const submitContactForm = () => {
+  contactForm.post(route('contact.submit'), {
+    preserveScroll: true,
+    onSuccess: () => {
+      contactForm.reset();
+    },
+  });
 };
 </script>
 
@@ -66,72 +92,260 @@ const openGoogleForm = () => {
     </section>
 
     <!-- Contact Section -->
-    <section class="py-12 md:py-16 bg-white">
+    <section class="py-16 bg-white">
       <div class="container mx-auto px-4">
-        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          <!-- Contact Information (Left Side) -->
-          <div class="w-full lg:w-1/2">
-            <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 md:mb-8 text-gray-800">Get in Touch</h2>
-            <div class="space-y-6">
-              <!-- Address -->
-              <div class="flex items-start">
-                <div class="icon-circle">
-                  <i class="fas fa-map-marker-alt"></i>
-                </div>
-                <div>
-                  <h3 class="text-lg font-bold mb-1 text-gray-800">Address</h3>
-                  <p class="text-sm md:text-base text-gray-600">016 Panapaan 2, Bacoor City, 4102, Cavite, Philippines</p>
-                </div>
-              </div>
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Get In Touch</h2>
+          <p class="text-gray-600 max-w-3xl mx-auto">Our team is ready to assist you with any questions about our polymer solutions and services.</p>
+        </div>
 
-              <!-- Phone -->
-              <div class="flex items-start">
-                <div class="icon-circle">
-                  <i class="fas fa-phone-alt"></i>
-                </div>
-                <div>
-                  <h3 class="text-lg font-bold mb-1 text-gray-800">Phone</h3>
-                  <a href="tel:+63285298978" class="block text-sm md:text-base text-gray-600 hover:text-primary transition">+63 (2) 85298978</a>
-                </div>
-              </div>
-
-              <!-- Email -->
-              <div class="flex items-start">
-                <div class="icon-circle">
-                  <i class="fas fa-envelope"></i>
-                </div>
-                <div>
-                  <h3 class="text-lg font-bold mb-1 text-gray-800">Email</h3>
-                  <a href="mailto:jamespro_asia@yahoo.com" class="block text-sm md:text-base text-gray-600 hover:text-primary transition break-all">jamespro_asia@yahoo.com</a>
-                  <a href="mailto:jamespolymers.international@gmail.com" class="block text-sm md:text-base text-gray-600 hover:text-primary transition break-all">jamespolymers.international@gmail.com</a>
-                </div>
-              </div>
-
-              <!-- Hours -->
-              <div class="flex items-start">
-                <div class="icon-circle">
-                  <i class="fas fa-clock"></i>
-                </div>
-                <div>
-                  <h3 class="text-lg font-bold mb-1 text-gray-800">Hours</h3>
-                  <p class="text-sm md:text-base text-gray-600">Monday-Friday: 8:00am - 5:00pm</p>
-                </div>
-              </div>
+        <!-- Contact Methods -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <!-- Call Us -->
+          <div class="contact-method bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 p-6 text-center">
+            <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <i class="fas fa-phone-alt text-primary text-2xl"></i>
             </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Call Us</h3>
+            <p class="text-gray-600 mb-4">Speak directly with our technical team</p>
+            <a href="tel:+63285298978" class="text-primary font-semibold hover:text-secondary transition">+63 (2) 8529 8978</a>
           </div>
 
-          <!-- Send Message Section (Right Side) -->
-          <div class="w-full lg:w-1/2">
-            <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 md:mb-8 text-gray-800">Send Us a Message</h2>
-            
-            <div class="flex items-center justify-start w-full">
-              <button
-                @click="openGoogleForm"
-                class="bg-gradient-to-r from-[#fdbb2d] to-[#f7931e] text-white hover:shadow-xl font-bold py-4 px-10 rounded-lg transition duration-300 shadow-lg transform hover:scale-105 flex items-center gap-3 text-lg uppercase"
-              >
-                <i class="fas fa-paper-plane"></i>
-                <span>Send Message</span>
-              </button>
+          <!-- Email Us -->
+          <div class="contact-method bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 p-6 text-center">
+            <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <i class="fas fa-envelope text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Email Us</h3>
+            <p class="text-gray-600 mb-4">Get detailed information about our products</p>
+            <a href="mailto:jamespolymers.international@gmail.com" class="text-primary font-semibold hover:text-secondary transition">jamespolymers.international@gmail.com</a>
+          </div>
+
+          <!-- Visit Us -->
+          <div class="contact-method bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 p-6 text-center">
+            <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <i class="fas fa-map-marker-alt text-primary text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Visit Us</h3>
+            <p class="text-gray-600 mb-4">Schedule a visit to our facilities</p>
+            <a href="#map" class="text-primary font-semibold hover:text-secondary transition">View Location</a>
+          </div>
+        </div>
+
+        <!-- Contact Form Section -->
+        <div class="border border-gray-800 shadow-lg shadow-gray-800/50 py-24 rounded-lg">
+          <div class="bg-white rounded-xl shadow-lg shadow-gray-900/80 p-8 max-w-5xl mx-auto border border-gray-300 mb-10">
+            <h2 class="text-2xl font-bold text-center mb-6">Send us a message</h2>
+
+            <!-- Success/Error Messages -->
+            <div v-if="success" class="text-green-600 font-bold text-center mb-4 bg-green-50 p-4 rounded-lg">
+              {{ success }}
+            </div>
+            <div v-if="error" class="text-red-600 font-bold text-center mb-4 bg-red-50 p-4 rounded-lg">
+              {{ error }}
+            </div>
+            <div v-if="contactForm.errors && Object.keys(contactForm.errors).length > 0" class="text-red-600 font-bold text-center mb-4 bg-red-50 p-4 rounded-lg">
+              Please correct the errors below
+            </div>
+
+            <form @submit.prevent="submitContactForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Left Column -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium mb-1" for="fullName">Full Name*</label>
+                  <input 
+                    v-model="contactForm.fullName"
+                    type="text" 
+                    id="fullName" 
+                    required 
+                    class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                    placeholder="John Doe"
+                  >
+                  <span v-if="contactForm.errors.fullName" class="text-red-500 text-xs">{{ contactForm.errors.fullName }}</span>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-1" for="email">Email Address*</label>
+                  <input 
+                    v-model="contactForm.email"
+                    type="email" 
+                    id="email" 
+                    required 
+                    class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                    placeholder="example@email.com"
+                  >
+                  <span v-if="contactForm.errors.email" class="text-red-500 text-xs">{{ contactForm.errors.email }}</span>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-1" for="phone">Phone Number*</label>
+                  <input 
+                    v-model="contactForm.phone"
+                    type="text" 
+                    id="phone" 
+                    required 
+                    class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                    placeholder="+123 456 7890"
+                  >
+                  <span v-if="contactForm.errors.phone" class="text-red-500 text-xs">{{ contactForm.errors.phone }}</span>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-1" for="companyName">Company Name (Optional)</label>
+                  <input 
+                    v-model="contactForm.companyName"
+                    type="text" 
+                    id="companyName" 
+                    class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                    placeholder="Company Inc."
+                  >
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium mb-1" for="position">Position in the Company (Optional)</label>
+                  <select 
+                    v-model="contactForm.position"
+                    id="position" 
+                    class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  >
+                    <option value="">Select a position</option>
+                    <option value="ceo">CEO / President / Owner</option>
+                    <option value="director">Director</option>
+                    <option value="manager">Manager / Team Lead</option>
+                    <option value="supervisor">Supervisor</option>
+                    <option value="senior">Senior Staff / Senior Associate</option>
+                    <option value="staff">Staff / Associate / Officer</option>
+                    <option value="intern">Intern / Trainee</option>
+                    <option value="consultant">Consultant / Advisor</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-1" for="companyAddress">Company Address*</label>
+                  <input 
+                    v-model="contactForm.companyAddress"
+                    type="text" 
+                    id="companyAddress" 
+                    required 
+                    class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" 
+                    placeholder="123 Main St."
+                  >
+                  <span v-if="contactForm.errors.companyAddress" class="text-red-500 text-xs">{{ contactForm.errors.companyAddress }}</span>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-1" for="subject">Subject*</label>
+                  <select 
+                    v-model="contactForm.subject"
+                    id="subject" 
+                    required 
+                    class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  >
+                    <option value="">Select a subject</option>
+                    <option value="inquiry">Inquiry</option>
+                    <option value="support">Support</option>
+                    <option value="feedback">Feedback</option>
+                  </select>
+                  <span v-if="contactForm.errors.subject" class="text-red-500 text-xs">{{ contactForm.errors.subject }}</span>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium mb-1" for="priority">Priority Level*</label>
+                  <select 
+                    v-model="contactForm.priority"
+                    id="priority" 
+                    required 
+                    class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  >
+                    <option value="">Select a priority</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                  <span v-if="contactForm.errors.priority" class="text-red-500 text-xs">{{ contactForm.errors.priority }}</span>
+                </div>
+              </div>
+
+              <!-- Message (Full Width) -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium mb-1" for="message">Message*</label>
+                <textarea 
+                  v-model="contactForm.message"
+                  id="message" 
+                  required 
+                  rows="5" 
+                  placeholder="Enter your message..." 
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-[200px]"
+                ></textarea>
+                <span v-if="contactForm.errors.message" class="text-red-500 text-xs">{{ contactForm.errors.message }}</span>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="md:col-span-2 text-center">
+                <button 
+                  type="submit"
+                  :disabled="contactForm.processing"
+                  class="bg-blue-600 text-white py-2 px-6 rounded-lg cursor-pointer hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {{ contactForm.processing ? 'Sending...' : 'Submit' }}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Headquarters Section -->
+          <div class="bg-white border border-gray-300 rounded-md p-10 shadow-lg shadow-gray-900/80 max-w-5xl mx-auto">
+            <p class="text-center text-2xl font-bold text-black mb-6">Our Headquarters</p>
+
+            <div class="flex flex-col md:flex-row justify-evenly gap-6">
+              <!-- Location -->
+              <div class="flex flex-col text-center w-full md:w-[280px] h-[230px] justify-start pt-8 p-4 items-center text-black border border-gray-300 shadow-lg rounded-md">
+                <div class="flex border bg-gray-200 rounded-full h-[45px] w-[45px] justify-center items-center mb-4">
+                  <i class="fas fa-map-marker-alt text-black text-xl"></i>
+                </div>
+                <p class="font-bold text-lg mb-2">Location</p>
+                <p class="text-sm">016 Panapaan II, Bacoor City, <br>Cavite, Philippines</p>
+              </div>
+
+              <!-- Business Hours -->
+              <div class="flex flex-col text-center w-full md:w-[280px] h-[230px] justify-start pt-8 p-4 items-center text-black border border-gray-300 shadow-lg rounded-md">
+                <div class="flex border bg-gray-200 rounded-full h-[45px] w-[45px] justify-center items-center mb-4">
+                  <i class="fas fa-clock text-black text-xl"></i>
+                </div>
+                <p class="font-bold text-lg mb-1">Business Hours</p>
+                <p class="text-sm font-semibold mb-0">Weekdays:</p>
+                <p class="text-sm mt-0">Monday - Friday: 8:00am - 5:00pm</p>
+                <p class="text-sm font-semibold mb-0 mt-1">Weekends:</p>
+                <p class="text-sm mt-0">Saturday - Sunday: Closed</p>
+              </div>
+
+              <!-- Social Media -->
+              <div class="flex flex-col text-center w-full md:w-[280px] h-[230px] justify-start pt-8 p-4 items-center text-black border border-gray-300 shadow-lg rounded-md">
+                <div class="flex border bg-gray-200 rounded-full h-[45px] w-[45px] justify-center items-center mb-4">
+                  <i class="fas fa-share-alt text-black text-xl"></i>
+                </div>
+                <p class="font-bold text-lg mb-1">Connect with Us</p>
+                <p class="text-sm mb-1">Our Social Media Platforms:</p>
+                <div class="flex flex-row items-center gap-4 mt-2 justify-center">
+                  <a href="https://www.linkedin.com/in/jgeintl/" target="_blank" class="flex flex-col items-center text-blue-700 hover:text-blue-500">
+                    <i class="fab fa-linkedin text-3xl"></i>
+                    <span class="text-xs text-black">LinkedIn</span>
+                  </a>
+
+                  <a href="https://www.instagram.com/jgempireintl" target="_blank" class="flex flex-col items-center text-pink-500 hover:text-pink-400">
+                    <i class="fab fa-instagram text-3xl"></i>
+                    <span class="text-xs text-black">Instagram</span>
+                  </a>
+
+                  <a href="https://www.facebook.com/profile.php?id=61573770164726" target="_blank" class="flex flex-col items-center text-blue-600 hover:text-blue-500">
+                    <i class="fab fa-facebook text-3xl"></i>
+                    <span class="text-xs text-black">Facebook</span>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -187,40 +401,29 @@ const openGoogleForm = () => {
 
     <!-- Footer -->
     <Footer />
+    <Chatbot />
   </div>
 </template>
 
 <style scoped>
 .bg-primary {
-  background-color: #0066cc;
+  background-color: #0f4c81;
 }
 
 .text-primary {
-  color: #0066cc;
+  color: #0f4c81;
 }
 
 .hover\:text-primary:hover {
-  color: #0066cc;
+  color: #0f4c81;
 }
 
-/* Icon circle styling */
-.icon-circle {
-  width: 50px;
-  height: 50px;
-  min-width: 50px;
-  background: linear-gradient(135deg, #fdbb2d 0%, #f7931e 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 1rem;
-  margin-top: 0.25rem;
-  flex-shrink: 0;
+.text-secondary {
+  color: #f7931e;
 }
 
-.icon-circle i {
-  color: white;
-  font-size: 1.25rem;
+.hover\:text-secondary:hover {
+  color: #f7931e;
 }
 
 /* Smooth scroll */
@@ -239,16 +442,6 @@ html {
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
-  }
-  
-  .icon-circle {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-  }
-  
-  .icon-circle i {
-    font-size: 1rem;
   }
 }
 
