@@ -69,7 +69,7 @@ Route::get('/', function () {
     $customers = \App\Models\Customer::orderBy('display_order')->get();
     
     // Get customer section settings
-    $customersHeading = DB::table('home_sections')
+    /* $customersHeading = DB::table('home_sections')
         ->where('section_name', 'customers')
         ->where('field_name', 'heading')
         ->value('value') ?? 'Our Valued Customers';
@@ -77,7 +77,7 @@ Route::get('/', function () {
     $customersSubheading = DB::table('home_sections')
         ->where('section_name', 'customers')
         ->where('field_name', 'subheading')
-        ->value('value') ?? "We're proud to partner with industry leaders.";
+        ->value('value') ?? "We're proud to partner with industry leaders."; */
     
     return Inertia::render('Website/Home', [
         'canLogin' => Route::has('login'),
@@ -102,8 +102,8 @@ Route::get('/', function () {
                 'display_order' => $customer->display_order
             ];
         })->toArray(),
-        'customersHeading' => $customersHeading,
-        'customersSubheading' => $customersSubheading
+        /* 'customersHeading' => $customersHeading,
+        'customersSubheading' => $customersSubheading */
     ]);
 })->name('home');
 
@@ -256,7 +256,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Admin Products Page
     Route::get('/products', [AdminProductController::class, 'indexPage'])->name('products.index');
 
-    // Admin Inquiries Page
+   // Admin Inquiries Page
     Route::get('/inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
     Route::patch('/inquiries/{id}/status', [InquiryController::class, 'updateStatus'])->name('inquiries.update-status');
     Route::post('/inquiries/{id}/reply', [InquiryController::class, 'sendReply'])->name('inquiries.reply');
@@ -352,10 +352,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/settings', [\App\Http\Controllers\Admin\CustomerController::class, 'updateSettings'])->name('settings');
     });
     
-    // Inquiries
-    Route::get('/inquiries', function () {
-        return Inertia::render('Admin/Inquiries');
-    })->name('inquiries');
+    /*
+|--------------------------------------------------------------------------
+| Inquiries Management
+|--------------------------------------------------------------------------
+*/
+    Route::prefix('inquiries')->name('inquiries.')->group(function () {
+        Route::get('/', [InquiryController::class, 'index'])->name('index');
+        Route::get('/export', [InquiryController::class, 'export'])->name('export');
+        Route::patch('/{id}/status', [InquiryController::class, 'updateStatus'])->name('update-status');
+        Route::post('/{id}/reply', [InquiryController::class, 'sendReply'])->name('reply');
+        Route::delete('/{id}', [InquiryController::class, 'destroy'])->name('destroy');
+    });
 });
 
 require __DIR__.'/auth.php';
