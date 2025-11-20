@@ -1,8 +1,23 @@
+
+
+
 <template>
+  <div v-if="isLoading" class="loading-overlay">
+  <orbit-spinner
+    :animation-duration="1200"
+    :size="80"
+    color="#ff1d5e"
+  />
+</div>
     <div>
         <Header />
     </div>
+    <!-- GLOBAL LOADER -->
+
+
     <Chatbot />
+
+
   <div class="homepage bg-gray-50 overflow-x-hidden">
     <!-- Modern Hero Section with Integrated Header -->
     <section class="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 min-h-screen flex items-center justify-center overflow-hidden pt-20">
@@ -345,6 +360,8 @@
 import { Link } from '@inertiajs/vue3';
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useHead } from '@vueuse/head'; // for Search Engine Optimization (SEO)
+import { OrbitSpinner } from "epic-spinners"; // Loading Spinner
+import { router } from "@inertiajs/vue3";
 
 import Header from '@/layouts/Header.vue';
 import Footer from '@/layouts/Footer.vue';
@@ -354,6 +371,18 @@ import axios from 'axios'
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 AOS.init();
+
+const isLoading = ref(false);
+
+// Inertia starts loading
+router.on("start", () => {
+  isLoading.value = true;
+});
+
+// Inertia finishes loading
+router.on("finish", () => {
+  isLoading.value = false;
+});
 
 // ADD SEO META TAGS
 useHead({
@@ -696,6 +725,29 @@ const recognitionAwards = [
 
 
 <style scoped>
+
+
+/* Spinner */
+.spinner-wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.8);
+  z-index: 9999;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.322);
+  z-index: 99999;
+}
+
 
 /* Responsive */
 @media (max-width: 1015px) {

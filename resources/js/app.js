@@ -6,6 +6,8 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import { createHead } from '@vueuse/head'; // for Search Engine Optimization (SEO)
+import ToastNotification from '@/components/ToastNotification.vue'; // Import Toast Component
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -22,6 +24,7 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue)
             .use(head) // for Search Engine Optimization (SEO)
+            .component('ToastNotification', ToastNotification) // Register Toast Component globally
             .mount(el);
     },
     progress: {

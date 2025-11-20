@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import Header from '@/layouts/Header.vue';
 import Footer from '@/layouts/Footer.vue';
 import Chatbot from '@/layouts/Chatbot.vue';
+import ToastNotification from '@/components/ToastNotification.vue';
 
 const props = defineProps({
   content: {
@@ -25,14 +26,6 @@ const props = defineProps({
         background_image: '/storage/assets/img/banners/contact_cta.jpg'
       }
     })
-  },
-  success: {
-    type: String,
-    default: ''
-  },
-  error: {
-    type: String,
-    default: ''
   }
 });
 
@@ -65,6 +58,9 @@ const submitContactForm = () => {
   </Head>
 
   <div>
+    <!-- Toast Notification -->
+    <ToastNotification />
+    
     <!-- Header -->
     <Header />
 
@@ -136,17 +132,6 @@ const submitContactForm = () => {
         <div class="border border-gray-800 shadow-lg shadow-gray-800/50 py-24 rounded-lg">
           <div class="bg-white rounded-xl shadow-lg shadow-gray-900/80 p-8 max-w-5xl mx-auto border border-gray-300 mb-10">
             <h2 class="text-2xl font-bold text-center mb-6">Send us a message</h2>
-
-            <!-- Success/Error Messages -->
-            <div v-if="success" class="text-green-600 font-bold text-center mb-4 bg-green-50 p-4 rounded-lg">
-              {{ success }}
-            </div>
-            <div v-if="error" class="text-red-600 font-bold text-center mb-4 bg-red-50 p-4 rounded-lg">
-              {{ error }}
-            </div>
-            <div v-if="contactForm.errors && Object.keys(contactForm.errors).length > 0" class="text-red-600 font-bold text-center mb-4 bg-red-50 p-4 rounded-lg">
-              Please correct the errors below
-            </div>
 
             <form @submit.prevent="submitContactForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Left Column -->
