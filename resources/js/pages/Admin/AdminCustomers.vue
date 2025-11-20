@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import AdminLayout from '@/layouts/Admin/AdminLayout.vue';
 import CustomerCard from '@/components/Admin/Customers/CustomerCard.vue';
@@ -36,6 +36,11 @@ const customerToDelete = ref(null);
 const showAlert = ref(!!props.success || !!props.error);
 const hasReordered = ref(false);
 
+watch(() => props.customers, (newCustomers) => {
+  localCustomers.value = [...newCustomers];
+  hasReordered.value = false;
+}, { deep: true });
+
 // Methods
 const handleAddCustomer = (formData) => {
   router.post(route('admin.customers.store'), formData, {
@@ -46,11 +51,12 @@ const handleAddCustomer = (formData) => {
 };
 
 const handleUpdateLogo = (customerId, formData) => {
-  router.post(route('admin.customers.update', customerId), {
-    _method: 'PUT',
-    ...formData
-  }, {
+  // Add _method to formData directly
+  formData.append('_method', 'PUT');
+  
+  router.post(route('admin.customers.update', customerId), formData, {
     forceFormData: true,
+    preserveScroll: true,
   });
 };
 
@@ -93,8 +99,11 @@ const saveOrder = () => {
   router.post(route('admin.customers.reorder'), {
     order: order
   }, {
+    preserveScroll: true,
     onSuccess: () => {
       hasReordered.value = false;
+      // Reload page to get fresh order from database
+      router.reload({ only: ['customers'] });
     }
   });
 };

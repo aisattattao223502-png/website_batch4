@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Award;
 use App\Models\AwardTimeline;
-use App\Http\Requests\StoreAwardRequest;
-use App\Http\Requests\UpdateAwardRequest;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AwardController extends Controller
@@ -19,47 +17,80 @@ class AwardController extends Controller
         
         return Inertia::render('Admin/AdminAwards', [
             'awards' => $awards,
-            'timelines' => $timelines,
+            'timelines' => $timelines
         ]);
     }
 
-    public function store(StoreAwardRequest $request)
+    public function store(Request $request)
     {
-        $validated = $request->validated();
-        
+        $validated = $request->validate([
+            'title' => 'required|string|max:300',
+            'description' => 'required|string|max:300',
+            'year' => 'required|string|max:300',
+            'icon' => 'nullable|string|max:300',
+            'event_title' => 'nullable|string|max:300',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120'
+        ]);
+
+        $data = [
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'year' => $validated['year'],
+            'icon' => $validated['icon'] ?? 'fa-trophy',
+            'event_title' => $validated['event_title'] ?? ''
+        ];
+
         // Handle image upload
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('assets/awards', $filename, 'public');
-            $validated['image'] = $filename;
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('storage/assets/img/awards'), $filename);
+            $data['image'] = $filename;
         }
-        
-        Award::create($validated);
-        
+
+        Award::create($data);
+
         return redirect()->route('admin.awards.index')
             ->with('success', 'Award added successfully!');
     }
 
-    public function update(UpdateAwardRequest $request, Award $award)
+    public function update(Request $request, Award $award)
     {
-        $validated = $request->validated();
-        
-        // Handle image upload
+        $validated = $request->validate([
+            'title' => 'required|string|max:300',
+            'description' => 'required|string|max:300',
+            'year' => 'required|string|max:300',
+            'icon' => 'nullable|string|max:300',
+            'event_title' => 'nullable|string|max:300',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120'
+        ]);
+
+        $data = [
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'year' => $validated['year'],
+            'icon' => $validated['icon'] ?? 'fa-trophy',
+            'event_title' => $validated['event_title'] ?? ''
+        ];
+
+        // Handle new image upload
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($award->image) {
-                Storage::disk('public')->delete('assets/awards/' . $award->image);
+                $oldImagePath = public_path('storage/assets/img/awards/' . $award->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
             }
-            
+
             $image = $request->file('image');
-            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('assets/awards', $filename, 'public');
-            $validated['image'] = $filename;
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('storage/assets/img/awards'), $filename);
+            $data['image'] = $filename;
         }
-        
-        $award->update($validated);
-        
+
+        $award->update($data);
+
         return redirect()->route('admin.awards.index')
             ->with('success', 'Award updated successfully!');
     }
@@ -68,11 +99,14 @@ class AwardController extends Controller
     {
         // Delete image if exists
         if ($award->image) {
-            Storage::disk('public')->delete('assets/awards/' . $award->image);
+            $imagePath = public_path('storage/assets/img/awards/' . $award->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
         }
-        
+
         $award->delete();
-        
+
         return redirect()->route('admin.awards.index')
             ->with('success', 'Award deleted successfully!');
     }

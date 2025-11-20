@@ -77,7 +77,7 @@ const handleDelete = () => {
       <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
         <img
           v-if="previewUrl || customer.logo_url"
-          :src="previewUrl || `/${customer.logo_url}`"
+          :src="previewUrl || `/storage/${customer.logo_url}`"
           :alt="customer.name"
           class="w-full h-full object-contain p-2"
         />

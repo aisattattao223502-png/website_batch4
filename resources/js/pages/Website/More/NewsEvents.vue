@@ -5,7 +5,7 @@
     <div class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
       <!-- Hero Section -->
       <section
-        class="relative bg-blue-400 h-96 flex items-center justify-center bg-cover bg-center"
+        class="relative bg-blue-400 h-96 flex items-center justify-center bg-cover bg-center mt-[14vh]"
         style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://www.james-polymers.com/wp-content/uploads/2021/09/products-banner.jpg')"
       >
         <img

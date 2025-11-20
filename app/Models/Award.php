@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Award extends Model
 {
-    use HasFactory;
-
+    protected $table = 'awards';
+    public $timestamps = false;
+    
     protected $fillable = [
         'title',
         'description',
-        'image',
         'year',
         'icon',
+        'event_title',
+        'image'
     ];
 }

@@ -24,11 +24,12 @@ const props = defineProps({
 const form = useForm({
     name: props.service?.name || '',
     description: props.service?.description || '',
+    youtube_url: props.service?.youtube_url || '', // ADD THIS LINE
     image: null,
     existing_image: props.service?.image_url || ''
 });
 
-const imagePreview = ref(props.service?.image_url ? `/storage/assets/${props.service.image_url}` : null);
+const imagePreview = ref(props.service?.image_url ? `/storage/${props.service.image_url}` : null);
 
 // Handle image selection
 const handleImageSelect = (event) => {
@@ -184,6 +185,26 @@ const formatDate = (dateString) => {
                         </p>
                     </div>
 
+                    <!-- YouTube URL -->
+                    <div>
+                        <label for="youtube_url" class="block text-sm font-medium text-gray-700 mb-2">
+                            YouTube Video URL (Optional)
+                        </label>
+                        <input
+                            id="youtube_url"
+                            v-model="form.youtube_url"
+                            type="url"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="https://youtu.be/..."
+                        />
+                        <p class="mt-2 text-xs text-gray-500">
+                            Add a YouTube video URL to showcase this service.
+                        </p>
+                        <p v-if="form.errors.youtube_url" class="mt-1 text-sm text-red-600">
+                            {{ form.errors.youtube_url }}
+                        </p>
+                    </div>
+
                     <!-- Image Upload -->
                     <div>
                         <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
@@ -276,7 +297,7 @@ const formatDate = (dateString) => {
                     <div class="relative h-48 bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden flex-shrink-0">
                         <img
                             v-if="service.image_url"
-                            :src="`/storage/assets/${service.image_url}`"
+                            :src="`/storage/${service.image_url}`"
                             :alt="service.name"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -332,7 +353,7 @@ const formatDate = (dateString) => {
                         <div class="pt-3 border-t border-gray-100">
                             <div class="flex items-center text-xs text-gray-500">
                                 <i class="fas fa-calendar-alt mr-2 text-gray-400"></i>
-                                <span>Added: {{ formatDate(service.created_at) }}</span>
+                                <span>Service ID: #{{ service.id }}</span>
                             </div>
                         </div>
                     </div>
