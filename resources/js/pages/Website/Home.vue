@@ -363,6 +363,7 @@ import { useHead } from '@vueuse/head'; // for Search Engine Optimization (SEO)
 import { OrbitSpinner } from "epic-spinners"; // Loading Spinner
 import { router } from "@inertiajs/vue3";
 
+
 import Header from '@/layouts/Header.vue';
 import Footer from '@/layouts/Footer.vue';
 import Chatbot from '@/layouts/Chatbot.vue'; 
