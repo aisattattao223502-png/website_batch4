@@ -124,7 +124,7 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span>{{ loading ? 'Redirecting...' : 'Go to Dashboard' }}</span>
+                  <span>{{ loading ? 'Redirecting...' : 'Log In' }}</span>
                 </button>
               </form>
 
@@ -177,14 +177,38 @@ const togglePassword = () => {
 };
 
 // Handle login - just redirect to dashboard (no authentication for now)
-const handleLogin = () => {
+// Replace the handleLogin function with this:
+const handleLogin = async () => {
   loading.value = true;
   
-  // Simulate loading delay for better UX
-  setTimeout(() => {
-    // Direct navigation to dashboard using Inertia
-    router.visit('/admin/dashboard');
-  }, 800);
+  try {
+    const response = await fetch('/admin/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: JSON.stringify({
+        email: form.value.email,
+        password: form.value.password
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      // Redirect to dashboard
+      window.location.href = data.redirect;
+    } else {
+      // Show error message
+      alert(data.message);
+      loading.value = false;
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    alert('An error occurred during login');
+    loading.value = false;
+  }
 };
 </script>
 

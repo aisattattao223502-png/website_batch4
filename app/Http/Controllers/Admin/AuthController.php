@@ -3,62 +3,66 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
-    /**
-     * Show the login form
-     */
-    public function showLogin()
-    {
-        // Redirect to dashboard if already authenticated
-        if (Auth::check()) {
-            return redirect()->route('admin.dashboard');
-        }
-        
-        return Inertia::render('Admin/AdminLogin');
-    }
-
-    /**
-     * Handle login request
-     */
     public function login(Request $request)
     {
-        // Validate the request
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string', 'min:6'],
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
         ]);
 
-        // Attempt to authenticate
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            // Regenerate session to prevent session fixation
-            $request->session()->regenerate();
+        // Find admin user
+        $admin = AdminUsers::where('email', $request->email)->first();
 
-            // Redirect to dashboard
-            return redirect()->intended(route('admin.dashboard'));
+        // Check if user exists, is active, and password matches
+        if ($admin && $admin->is_active && Hash::check($request->password, $admin->password)) {
+            // Store admin info in session
+            Session::put('admin_id', $admin->id);
+            Session::put('admin_name', $admin->name);
+            Session::put('admin_email', $admin->email);
+
+            // Update last login
+            $admin->update(['last_login' => now()]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login successful',
+                'redirect' => route('admin.dashboard')
+            ]);
         }
 
-        // Authentication failed
-        throw ValidationException::withMessages([
-            'email' => 'Invalid email or password.',
-        ]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid credentials or account is inactive'
+        ], 401);
     }
 
-    /**
-     * Handle logout request
-     */
-    public function logout(Request $request)
+    public function logout()
     {
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
+        Session::flush();
         return redirect()->route('admin.login');
+    }
+
+    public function check()
+    {
+        if (Session::has('admin_id')) {
+            $admin = AdminUsers::find(Session::get('admin_id'));
+            return response()->json([
+                'authenticated' => true,
+                'admin' => [
+                    'name' => $admin->name,
+                    'email' => $admin->email
+                ]
+            ]);
+        }
+
+        return response()->json(['authenticated' => false]);
     }
 }
