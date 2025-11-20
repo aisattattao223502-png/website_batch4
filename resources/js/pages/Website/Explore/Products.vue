@@ -279,7 +279,7 @@
               :key="service.id"
               class="bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 overflow-hidden"
             >
-              <div class="h-40 sm:h-44 md:h-48 bg-gray-200 bg-cover bg-center" :style="{ backgroundImage: `url(${service.image_url})` }"></div>
+              <div class="h-40 sm:h-44 md:h-48 bg-gray-200 bg-cover bg-center" :style="{ backgroundImage: `url(/storage/${service.image_url})` }"></div>
               <div class="p-4 sm:p-6">
                 <div class="flex items-center mb-2 sm:mb-3">
                   <div class="bg-blue-600 bg-opacity-10 p-1.5 sm:p-2 rounded-full mr-2 sm:mr-3 flex-shrink-0">
@@ -1100,51 +1100,13 @@ const products = [
   }
 ];
 
-// Services data
-const services = [
-  {
-    id: 1,
-    name: 'Ultrasonic Welding Services',
-    description: 'High-powered ultrasonic welding for sealing plastic parts with precision and consistency.',
-    image_url: '/storage/assets/img/services/Ultrasonic.webp',
-    youtube_url: 'https://youtu.be/2mDk5121I8E'
-  },
-  {
-    id: 2,
-    name: 'Sub-Assembly Services',
-    description: 'Complete assembly of plastic-to-plastic, plastic-to-rubber, and plastic-to-metal components.',
-    image_url: '/storage/assets/img/services/Assembly.webp',
-    youtube_url: 'https://youtu.be/cXbxFFckDTg'
-  },
-  {
-    id: 6,
-    name: 'Precision CNC & Mold Solutions',
-    description: 'Vertical milling machining center (VMC) / CNC machining, mold design & mold fabrication using latest technology & conventional machines',
-    image_url: '/storage/assets/img/services/Precision.jpg',
-    youtube_url: 'https://youtu.be/alYxZuHd7M4'
-  },
-  {
-    id: 9,
-    name: 'Rubber Compression Molding',
-    description: 'A heat-and-pressure-based process ensuring durability and structural integrity of molded rubber parts.',
-    image_url: '/storage/assets/img/services/Compression.jpg',
-    youtube_url: 'https://youtu.be/WcLgX740a8U'
-  },
-  {
-    id: 10,
-    name: 'Silkscreen Printing',
-    description: 'Manual and automatic silkscreen printing solutions for plastic-injected parts and bottles with vibrant, lasting finishes.',
-    image_url: '/storage/assets/img/services/Silkscreen.jpg',
-    youtube_url: ''
-  },
-  {
-    id: 11,
-    name: '3D Rapid Prototyping',
-    description: 'Fast and accurate 3D printed prototypes for validating plastic injection and rubber compression designs before full-scale production.',
-    image_url: '/storage/assets/img/services/3D.jpg',
-    youtube_url: 'https://youtu.be/R4bsubxG4UY'
-  }
-];
+// Define props to receive services from backend
+const props = defineProps({
+    services: {
+        type: Array,
+        default: () => []
+    }
+});
 
 // Computed properties
 const filteredProducts = computed(() => {

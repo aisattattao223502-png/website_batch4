@@ -30,7 +30,7 @@ const form = useForm({
     coming_soon: props.industry?.coming_soon || false
 });
 
-const imagePreview = ref(props.industry?.image_url ? `/storage/assets/${props.industry.image_url}` : null);
+const imagePreview = ref(props.industry?.image_url ? `/storage/${props.industry.image_url}` : null);
 
 // Handle image selection
 const handleImageSelect = (event) => {
@@ -45,11 +45,13 @@ const handleImageSelect = (event) => {
 const submitForm = () => {
     if (props.mode === 'create') {
         form.post(route('admin.industries.store'), {
+            forceFormData: true,
             preserveScroll: true,
             onSuccess: () => form.reset(),
         });
     } else if (props.mode === 'edit') {
         form.post(route('admin.industries.update', props.industry.id), {
+            forceFormData: true,
             preserveScroll: true,
         });
     }
@@ -323,7 +325,7 @@ const goToEdit = (id) => {
                     <div class="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
                         <img
                             v-if="industry.image_url"
-                            :src="`/storage/assets/${industry.image_url}`"
+                            :src="`/storage/${industry.image_url}`"
                             :alt="industry.name"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />

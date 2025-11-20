@@ -31,6 +31,7 @@ const awardForm = useForm({
     description: '',
     year: '',
     icon: 'fa-trophy',
+    event_title: '', // ADD THIS LINE
     image: null,
     existing_image: ''
 });
@@ -49,16 +50,21 @@ const imagePreview = ref(null);
 const openAddModal = (type) => {
     modalType.value = type;
     modalMode.value = 'create';
-    
+
     if (type === 'award') {
         awardForm.reset();
+        awardForm.id = null;
+        awardForm.image = null;
+        awardForm.existing_image = '';
         imagePreview.value = null;
     } else {
         timelineForm.reset();
+        timelineForm.id = null;
     }
-    
+
     showModal.value = true;
 };
+
 
 // Open modal for editing
 const openEditModal = (type, item) => {
@@ -72,7 +78,7 @@ const openEditModal = (type, item) => {
         awardForm.year = item.year;
         awardForm.icon = item.icon;
         awardForm.existing_image = item.image;
-        imagePreview.value = item.image ? `/storage/assets/awards/${item.image}` : null;
+        imagePreview.value = item.image ? `/storage/assets/img/awards/${item.image}` : null;
     } else {
         timelineForm.id = item.id;
         timelineForm.title = item.title;
@@ -106,11 +112,13 @@ const submitForm = () => {
     if (modalType.value === 'award') {
         if (modalMode.value === 'create') {
             awardForm.post(route('admin.awards.store'), {
+                forceFormData: true, // ADD THIS
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
             });
         } else {
             awardForm.post(route('admin.awards.update', awardForm.id), {
+                forceFormData: true, // ADD THIS
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
             });
@@ -274,7 +282,7 @@ const modalTitle = computed(() => {
                     <div class="relative h-40 bg-gradient-to-br from-yellow-50 to-yellow-100 overflow-hidden">
                         <img
                             v-if="award.image"
-                            :src="`/storage/assets/awards/${award.image}`"
+                            :src="`/storage/assets/img/awards/${award.image}`"
                             :alt="award.title"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -308,6 +316,26 @@ const modalTitle = computed(() => {
                             <span class="inline-flex items-center px-3 py-1 bg-yellow-500 text-white text-sm font-semibold rounded-full shadow-lg">
                                 {{ award.year }}
                             </span>
+                        </div>
+
+                        <!-- Event Title (Awards only) -->
+                        <div v-if="modalType === 'award'">
+                            <label for="modal-event-title" class="block text-sm font-medium text-gray-700 mb-2">
+                                Event Title
+                            </label>
+                            <input
+                                id="modal-event-title"
+                                v-model="awardForm.event_title"
+                                type="text"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                placeholder="e.g., Golden Globe Awards"
+                            />
+                            <p class="mt-2 text-xs text-gray-500">
+                                Optional: Name of the awarding organization or event.
+                            </p>
+                            <p v-if="awardForm.errors.event_title" class="mt-1 text-sm text-red-600">
+                                {{ awardForm.errors.event_title }}
+                            </p>
                         </div>
                     </div>
                     

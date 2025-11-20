@@ -252,170 +252,21 @@ const showModal = ref(false);
 const selectedAward = ref(null);
 
 // Hardcoded Awards Data from SQL
-const awards = ref([
-  {
-    id: 1,
-    title: 'Certificate of Recognition',
-    description: 'Best Trusted Plastic Injection & Molded Rubber Products Manufacturer. The Golden Globe Annual Awards for Business Excellence (GGAABE) is a recognition that searches for companies and brands that exhibit innovative business practices, deliver quality products and services, epitomize customer concern',
-    year: '2023',
-    icon: 'fa-medal',
-    event_title: 'Golden Globe Annual Awards For Business Excellence',
-    image: 'biggold_frame.jpg'
-  },
-  {
-    id: 2,
-    title: 'Service Award',
-    description: 'In sincere recognition of meritorious and dedicated service rendered to our Company throughout the years and for having manifested its deep commitment and untiring support towards the realization of our common goals and visions. Given this 10th Day of June, in the Year of our Lord, two thousand and',
-    year: '2004',
-    icon: 'fa-medal',
-    event_title: 'Matsushita Electric Philippines Corporation (MEPCO) Panasonic Communication Imaging Corp. of the Phils. (PCIP)',
-    image: 'illuminati_logo.jpg'
-  },
-  {
-    id: 3,
-    title: 'Achievement Award',
-    description: 'In sincere recognition of its outstanding effort and dedicated support in all the Panasonic Group of Companies in the Philippines (PGCP) Business operations, more specifically in acquiring the ISO 14001 Certification, which contributed immeasurably to PGCP towards attaining one of the major directiv',
-    year: '2005',
-    icon: 'fa-medal',
-    event_title: 'Panasonic Group of Companies in the Philippines',
-    image: 'better_shark_fin.jpg'
-  },
-  {
-    id: 4,
-    title: 'Plaque of Appreciation',
-    description: 'In appreciation of continuous support and valuable services rendered to Matsushita Electric Philippines Corporation and Matsushita Communication Industrial Corporation of the Philippines from April 1995 to March 1996. Given this 31st Day of May, in the year of our Lord, Nineteen hundred and ninety s',
-    year: '1996',
-    icon: 'fa-medal',
-    event_title: 'Matsushita Electric Philippines Corporation Matsushita Communication Industrial Corp. of the Phils.',
-    image: 'shark_fin_award.jpg'
-  },
-  {
-    id: 5,
-    title: 'Total Quality Achievement Award',
-    description: 'Preferred Supplier. Given this 3rd day of May 2011 at Bayanihan Center, United Laboratories Inc.',
-    year: '2011',
-    icon: 'fa-medal',
-    event_title: 'United Laboratories Inc.',
-    image: 'malaking_T.jpg'
-  },
-  {
-    id: 6,
-    title: 'Certificate of Appreciation',
-    description: 'For continuous support and cooperation given to Koppel Incorporated. Given this 7th day of December 2012 at Tiara Oriental Hotel, Makati City, Philippines',
-    year: '2012',
-    icon: 'fa-medal',
-    event_title: 'Koppel Incorporated',
-    image: 'koppel.jpg'
-  },
-  {
-    id: 7,
-    title: 'Best in Delivery',
-    description: "In recognition of your valuable service in providing punctual delivery of parts of material to Concepcion Durables, Incorporated thus contributing to the company's timely production of finished goods from January to March 2008. Given this 29th day of April two thousand and eight during CDi Supplier'",
-    year: '2008',
-    icon: 'fa-medal',
-    event_title: 'Concepcion Durables, Inc.',
-    image: 'best_in_delivery.jpg'
-  },
-  {
-    id: 8,
-    title: 'Certificate of Recognition',
-    description: 'Certificate of Recognition to James Polymer Manufacturing for being a SGS Quality Partner through its successful certification to ISO 9001:2000 Quality Management Systems in June 2007. Given this 12th day of September 2008 on the occasion of the SGS Quality Network Forum Appreciation Night at the To',
-    year: '2008',
-    icon: 'fa-medal',
-    event_title: 'SGS Quality Network Forum Appreciation Night',
-    image: 'SGS_bluebird.jpg'
-  },
-  {
-    id: 9,
-    title: 'Best in Environmental Management System Award',
-    description: 'In recognition of its outstanding Environmental Management System performance from April 2006 to March 2007; and in acknowledgement of its continuous support and cooperation in complying to our RoHS requirements thus ensuring the non-use of hazardous substances in the materials and parts being suppl',
-    year: '2007',
-    icon: 'fa-medal',
-    event_title: 'Panasonic Manufacturing Philippines Corporation',
-    image: 'mahabang_blue_may_E.jpg'
-  },
-  {
-    id: 10,
-    title: 'Plaque of Appreciation',
-    description: "In recognition for its continuous support and dedicated services rendered to all the Matsushita Philippines Group of Companies' business operations from April 1998 to March 1999. Given this 30th day of April, in the Year of our Lord, nineteen hundred and ninety nine at City Garden, Mandaluyong City.",
-    year: '1999',
-    icon: 'fa-medal',
-    event_title: "Matsushita Philippines Group of Companies' business operations",
-    image: 'plaque2matsushita.jpg'
-  },
-  {
-    id: 11,
-    title: 'Plaque of Appreciation',
-    description: 'In recognition of continuous support and valuable services rendered to Matsushita Electric Philippines Corporation; Matsushita Communication Industrial Corporation of the Philippines and Matsushita Business Machine Corporation of the Philippines Business Operation from April 1996 to March 1997. Give',
-    year: '1997',
-    icon: 'fa-medal',
-    event_title: 'Matsushita Philippines Group Companies Business Operations',
-    image: 'apprec_matsushita2.jpg'
-  },
-  {
-    id: 12,
-    title: 'Appreciation Award',
-    description: 'In recognition of its continuous support and dedicated services rendered to the business operations of Panasonic Group of Companies in the Philippines from April 2007 to March 2008. Given this 27th day of June, in the Year of our Lord, two thousand and eight at Dusit Thani Manila Hotel, Makati City',
-    year: '2008',
-    icon: 'fa-medal',
-    event_title: 'Panasonic Manufacturing Philippines Corporation/Panasonic Communications Philippines Corporation',
-    image: 'appawards1.jpg'
-  },
-  {
-    id: 13,
-    title: 'Appreciation Award',
-    description: 'In recognition of its continuous support and dedicated services rendered to the business operation of MEPCO and MBP from April 2000 to March 2001. Given this 31st Day of August, in the Year of our Lord, two thousand and one at Dusit Hotel Nikko, Makati City',
-    year: '2001',
-    icon: 'fa-medal',
-    event_title: 'Matsushita Electric Philippines Corporations (MEPCO), Matsushita Business Machine Corp, of the Philippines (MBP)',
-    image: 'appmatsushita.jpg'
-  },
-  {
-    id: 14,
-    title: 'Plaque of Appreciation',
-    description: 'In recognition of the continuous support and valuable services rendered to Matsushita Electric Philippines Corporation of the Philippines and Matsushita Business Machine Corporation of the Philippines business operations from April 1997 to March 1998',
-    year: '1998',
-    icon: 'fa-medal',
-    event_title: 'Matsushita Electric Philippines Corporation and Matsushita Business Machine Corporation',
-    image: 'appawards2.jpg'
-  },
-  {
-    id: 15,
-    title: 'ISO 14001: 2004 Environmental Management System',
-    description: 'ISO 14001: 2004 Environmental Management System covering the Manufacture of Molded Rubber and Plastic Products through Compression Molding and Plastic Injection Process, respectively at 016 Panapaan 2, Aguinaldo Highway & 35 Coastal Green, Panapaan 1 Bacoor, Cavite, Philippines 4102',
-    year: '2004',
-    icon: 'fa-medal',
-    event_title: 'Certech Registration Inc.',
-    image: 'newiso4001.jpg'
-  },
-  {
-    id: 16,
-    title: 'Best Trusted Plastic Injection & Molded Rubber Products Manufacturer',
-    description: 'Golden Globe Annual Awards for Business Excellence & Outstanding Filipino Achievers',
-    year: '2023',
-    icon: 'fa-medal',
-    event_title: 'Golden Globe Awards',
-    image: 'BEST.jpg'
-  },
-  {
-    id: 17,
-    title: 'Best Trusted Plastic Injection & Molded Rubber Products Manufacturer',
-    description: 'Golden Globe Annual Awards for Business Excellence & Outstanding Filipino Achievers',
-    year: '2023',
-    icon: 'fa-medal',
-    event_title: 'Golden Globe Awards',
-    image: 'AWARDEE.png'
-  },
-  {
-    id: 18,
-    title: 'All Awards',
-    description: 'A showcase of our prestigious awards and certifications, reflecting excellence, quality, and commitment across all aspects of our operations.',
-    year: '1996 - 2023',
-    icon: 'fa-medal',
-    event_title: '',
-    image: 'AWARDS.avif'
-  }
-]);
+// Define props to receive data from backend
+const props = defineProps({
+    awards: {
+        type: Array,
+        default: () => []
+    },
+    timeline: {
+        type: Array,
+        default: () => []
+    }
+});
+
+// Use props data instead of hardcoded
+const awards = computed(() => props.awards);
+const timeline = computed(() => props.timeline);
 
 // Sort awards alphabetically by title, but keep "All Awards" at the end
 const sortedAwards = computed(() => {
@@ -428,38 +279,6 @@ const sortedAwards = computed(() => {
   
   return allAwardsItem ? [...sorted, allAwardsItem] : sorted;
 });
-
-// Hardcoded Timeline Data from SQL
-const timeline = ref([
-  {
-    id: 1,
-    title: 'Best Trusted Plastic Injection & Molded Rubber Products Manufacturer',
-    description: 'Golden Globe Annual Awards for Business Excellence & Outstanding Filipino Achievers',
-    date: '2023-03-15',
-    icon: 'fa-trophy'
-  },
-  {
-    id: 2,
-    title: 'Green Manufacturing Certification',
-    description: 'Achieved Green Manufacturing Certification for our sustainable production processes and reduced environmental footprint.',
-    date: '2021-03-15',
-    icon: 'fa-leaf'
-  },
-  {
-    id: 3,
-    title: 'Export Excellence Award',
-    description: 'Recognized for outstanding export performance and contribution to the national economy.',
-    date: '2020-11-20',
-    icon: 'fa-medal'
-  },
-  {
-    id: 4,
-    title: 'ISO 9001:2015 Certification',
-    description: 'Successfully implemented Quality Management System and achieved ISO 9001:2015 certification.',
-    date: '2019-08-10',
-    icon: 'fa-certificate'
-  }
-]);
 
 const openAwardModal = (award) => {
   selectedAward.value = award;

@@ -109,11 +109,6 @@ onMounted(() => {
     <section class="relative py-12 md:py-16 lg:py-20 text-white">
       <!-- Background image with opacity -->
       <div class="absolute inset-0">
-        <img
-          src="/storage/assets/img/banners/privacy_cta.jpg"
-          alt="Banner Background"
-          class="w-full h-full object-cover opacity-80"
-        >
       </div>
     </section>
 
