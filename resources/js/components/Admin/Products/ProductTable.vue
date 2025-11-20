@@ -1,6 +1,4 @@
 <script setup>
-import { computed } from 'vue';
-
 const props = defineProps({
   products: {
     type: Array,
@@ -10,144 +8,155 @@ const props = defineProps({
 
 const emit = defineEmits(['edit', 'delete']);
 
-// Get category badge classes
-const getCategoryClass = (category) => {
-  const classes = {
-    thermoplastic: 'bg-blue-100 text-blue-800',
-    engineering: 'bg-green-100 text-green-800',
-    custom: 'bg-purple-100 text-purple-800',
-    appliance: 'bg-yellow-100 text-yellow-800',
-    automotive: 'bg-red-100 text-red-800',
-    industrial: 'bg-indigo-100 text-indigo-800'
+const getCategoryLabel = (category) => {
+  const labels = {
+    'appliance': 'Appliance Parts',
+    'automotive': 'Automotive Parts',
+    'industrial': 'Industrial Components'
   };
-  return classes[category] || 'bg-gray-100 text-gray-800';
+  return labels[category] || category;
 };
 
-// Format date
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
+const getMaterialLabel = (material) => {
+  const labels = {
+    'plastic': 'Plastic',
+    'rubber': 'Rubber',
+    'custom': 'Custom'
+  };
+  return labels[material] || material;
 };
 
-// Truncate description
-const truncate = (text, length = 100) => {
-  if (!text) return '';
-  return text.length > length ? text.substring(0, length) + '...' : text;
-};
-
-const handleEdit = (product) => {
-  emit('edit', product);
-};
-
-const handleDelete = (product) => {
-  emit('delete', product);
+const handleImageError = (event) => {
+  console.error('Image failed to load:', event.target.src);
+  
+  // Try alternate paths
+  const currentSrc = event.target.src;
+  const imagePath = event.target.dataset.originalPath;
+  
+  // If this is the first error, try without /storage prefix (for direct public assets)
+  if (!event.target.dataset.retried && imagePath) {
+    event.target.dataset.retried = 'true';
+    
+    // Try as direct public path
+    if (imagePath.startsWith('/storage/')) {
+      const directPath = imagePath.replace('/storage/', '/');
+      console.log('Retrying with direct path:', directPath);
+      event.target.src = directPath;
+      return;
+    }
+  }
+  
+  // If all attempts fail, show placeholder
+  event.target.style.display = 'none';
+  const parent = event.target.parentElement;
+  if (parent) {
+    parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-100"><i class="fas fa-image text-gray-300 text-2xl"></i></div>';
+  }
 };
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th scope="col" class="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Image
             </th>
-            <th scope="col" class="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-              Product Details
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Product Name
             </th>
-            <th scope="col" class="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Category
             </th>
-            <th scope="col" class="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-              Date Added
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Material
             </th>
-            <th scope="col" class="py-4 px-6 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Created
+            </th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
             </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr
-            v-for="product in products"
-            :key="product.id"
-            class="hover:bg-gray-50 transition-colors"
-          >
+          <tr v-for="product in products" :key="product.id" class="hover:bg-gray-50">
             <!-- Image -->
-            <td class="py-4 px-6 whitespace-nowrap">
-              <div v-if="product.image_url" class="flex-shrink-0 h-16 w-16">
-                <img
-                  :src="`/${product.image_url}`"
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                <img 
+                  v-if="product.image_url" 
+                  :src="product.image_url" 
                   :alt="product.name"
-                  class="h-16 w-16 rounded-lg object-cover shadow-sm"
+                  @error="handleImageError"
+                  class="w-full h-full object-contain"
                 />
-              </div>
-              <div v-else class="h-16 w-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                <i class="fas fa-image text-gray-400 text-xl"></i>
+                <i v-else class="fas fa-image text-gray-300 text-2xl"></i>
               </div>
             </td>
 
-            <!-- Product Details -->
-            <td class="py-4 px-6">
-              <div class="max-w-md">
-                <div class="text-sm font-semibold text-gray-900 mb-1">
-                  {{ product.name }}
-                </div>
-                <div class="text-sm text-gray-500">
-                  {{ truncate(product.description) }}
-                </div>
-              </div>
+            <!-- Product Name -->
+            <td class="px-6 py-4">
+              <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
+              <div class="text-sm text-gray-500 line-clamp-2">{{ product.description }}</div>
             </td>
 
             <!-- Category -->
-            <td class="py-4 px-6 whitespace-nowrap">
-              <span
-                :class="['px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full', getCategoryClass(product.category)]"
-              >
-                {{ product.category.charAt(0).toUpperCase() + product.category.slice(1) }}
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span :class="[
+                'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                product.category_badge
+              ]">
+                {{ getCategoryLabel(product.category) }}
               </span>
             </td>
 
-            <!-- Date -->
-            <td class="py-4 px-6 whitespace-nowrap text-sm text-gray-500">
-              {{ formatDate(product.created_at) }}
+            <!-- Material -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="text-sm text-gray-900">{{ getMaterialLabel(product.material_type) }}</span>
+            </td>
+
+            <!-- Created Date -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {{ product.created_at }}
             </td>
 
             <!-- Actions -->
-            <td class="py-4 px-6 whitespace-nowrap text-sm font-medium">
-              <div class="flex items-center space-x-3">
-                <button
-                  @click="handleEdit(product)"
-                  class="text-blue-600 hover:text-blue-800 transition-colors"
-                  title="Edit product"
-                >
-                  <i class="fas fa-edit text-lg"></i>
-                </button>
-                <button
-                  @click="handleDelete(product)"
-                  class="text-red-600 hover:text-red-800 transition-colors"
-                  title="Delete product"
-                >
-                  <i class="fas fa-trash text-lg"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Empty State -->
-          <tr v-if="products.length === 0">
-            <td colspan="5" class="py-12 text-center">
-              <i class="fas fa-box-open text-gray-300 text-6xl mb-4"></i>
-              <p class="text-gray-500 font-medium mb-2">No products found</p>
-              <p class="text-sm text-gray-400">Click "Add New Product" to create one</p>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button
+                @click="emit('edit', product)"
+                class="text-blue-600 hover:text-blue-900 mr-4"
+                title="Edit"
+              >
+                <i class="fas fa-edit"></i>
+              </button>
+              <button
+                @click="emit('delete', product)"
+                class="text-red-600 hover:text-red-900"
+                title="Delete"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- Empty State -->
+    <div v-if="products.length === 0" class="text-center py-12">
+      <i class="fas fa-box-open text-gray-300 text-6xl mb-4"></i>
+      <p class="text-gray-500 font-medium">No products found</p>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

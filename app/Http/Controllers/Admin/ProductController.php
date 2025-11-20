@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -12,60 +16,26 @@ class ProductController extends Controller
      */
     public function index()
     {
-        // Sample products data - replace with database queries later
-        $products = [
-            [
-                'id' => 1,
-                'name' => 'Polypropylene Compound',
-                'description' => 'High-quality polypropylene compound suitable for various industrial applications. Excellent chemical resistance and durability.',
-                'category' => 'thermoplastic',
-                'image_url' => 'storage/products/sample1.jpg',
-                'created_at' => '2024-11-15 10:30:00',
-            ],
-            [
-                'id' => 2,
-                'name' => 'ABS Automotive Grade',
-                'description' => 'Premium ABS material specifically designed for automotive applications with superior impact resistance.',
-                'category' => 'automotive',
-                'image_url' => 'storage/products/sample2.jpg',
-                'created_at' => '2024-11-14 14:20:00',
-            ],
-            [
-                'id' => 3,
-                'name' => 'Engineering Plastic Compound',
-                'description' => 'Advanced engineering plastic for high-performance applications requiring excellent mechanical properties.',
-                'category' => 'engineering',
-                'image_url' => 'storage/products/sample3.jpg',
-                'created_at' => '2024-11-13 09:15:00',
-            ],
-            [
-                'id' => 4,
-                'name' => 'Custom TPE Material',
-                'description' => 'Customized thermoplastic elastomer with tailored properties for specific customer requirements.',
-                'category' => 'custom',
-                'image_url' => 'storage/products/sample4.jpg',
-                'created_at' => '2024-11-12 16:45:00',
-            ],
-            [
-                'id' => 5,
-                'name' => 'Appliance Housing Material',
-                'description' => 'Specialized material for appliance housings with excellent heat resistance and aesthetic finish.',
-                'category' => 'appliance',
-                'image_url' => 'storage/products/sample5.jpg',
-                'created_at' => '2024-11-11 11:00:00',
-            ],
-            [
-                'id' => 6,
-                'name' => 'Industrial Grade Polymer',
-                'description' => 'Heavy-duty industrial polymer designed for demanding manufacturing environments.',
-                'category' => 'industrial',
-                'image_url' => 'storage/products/sample6.jpg',
-                'created_at' => '2024-11-10 13:30:00',
-            ],
-        ];
+        $products = Product::orderBy('material_type')
+            ->orderBy('name')
+            ->get()
+            ->map(function($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'category' => $product->category,
+                    'material_type' => $product->material_type,
+                    'image_url' => $product->image_url,
+                    'features' => $product->features ?? [],
+                    'created_at' => $product->created_at->format('M d, Y'),
+                    'category_badge' => $product->category_badge,
+                ];
+            });
 
         return Inertia::render('Admin/AdminProducts', [
             'products' => $products,
+            'action' => 'list',
             'success' => session('success'),
             'error' => session('error'),
         ]);
@@ -79,7 +49,49 @@ class ProductController extends Controller
         return Inertia::render('Admin/AdminProducts', [
             'action' => 'create',
             'product' => null,
+            'success' => null,
+            'error' => null,
         ]);
+    }
+
+    /**
+     * Store a newly created product
+     */
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'category' => 'required|in:appliance,automotive,industrial',
+                'material_type' => 'required|in:plastic,rubber,custom',
+                'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+                'features' => 'nullable|array',
+                'features.*' => 'string'
+            ]);
+
+            // In store() method
+        if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $filename = time() . '_' . $image->getClientOriginalName();
+        $path = $image->storeAs('products', $filename, 'public');
+        $validated['image_url'] = '/storage/' . $path;
+        // This creates: /storage/products/1234567890_image.jpg
+        }
+
+            // Remove the 'image' key if it exists (we've already processed it)
+            unset($validated['image']);
+
+            Product::create($validated);
+
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Product added successfully!');
+        } catch (\Exception $e) {
+            Log::error('Product creation failed: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Failed to create product: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**
@@ -87,48 +99,96 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        // Sample product data for editing - replace with database query later
-        $product = [
-            'id' => $id,
-            'name' => 'Sample Product',
-            'description' => 'This is a sample product description.',
-            'category' => 'thermoplastic',
-            'image_url' => 'storage/products/sample.jpg',
-        ];
+        $product = Product::findOrFail($id);
 
-        return Inertia::render('Admin/Products', [
+        return Inertia::render('Admin/AdminProducts', [
             'action' => 'edit',
-            'product' => $product,
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'category' => $product->category,
+                'material_type' => $product->material_type,
+                'image_url' => $product->image_url,
+                'features' => $product->features ?? [],
+            ],
+            'success' => null,
+            'error' => null,
         ]);
     }
 
     /**
-     * Store a newly created product (placeholder for future)
+     * Update the specified product
      */
-    public function store()
+    public function update(Request $request, $id)
     {
-        // This will be implemented when connecting to database
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product added successfully!');
+        try {
+            $product = Product::findOrFail($id);
+
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'category' => 'required|in:appliance,automotive,industrial',
+                'material_type' => 'required|in:plastic,rubber,custom',
+                'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+                'features' => 'nullable|array',
+                'features.*' => 'string'
+            ]);
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($product->image_url && str_starts_with($product->image_url, '/storage/')) {
+                    $oldPath = str_replace('/storage/', '', $product->image_url);
+                    Storage::disk('public')->delete($oldPath);
+                }
+                
+                $image = $request->file('image');
+                $filename = time() . '_' . $image->getClientOriginalName();
+                $path = $image->storeAs('products', $filename, 'public');
+                $validated['image_url'] = '/storage/' . $path;
+            } else {
+                // Keep existing image if no new image uploaded
+                $validated['image_url'] = $request->input('image_url', $product->image_url);
+            }
+
+            // Remove the 'image' key if it exists
+            unset($validated['image']);
+
+            $product->update($validated);
+
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Product updated successfully!');
+        } catch (\Exception $e) {
+            Log::error('Product update failed: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Failed to update product: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**
-     * Update the specified product (placeholder for future)
-     */
-    public function update($id)
-    {
-        // This will be implemented when connecting to database
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product updated successfully!');
-    }
-
-    /**
-     * Remove the specified product (placeholder for future)
+     * Remove the specified product
      */
     public function destroy($id)
     {
-        // This will be implemented when connecting to database
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product deleted successfully!');
+        try {
+            $product = Product::findOrFail($id);
+
+            // Delete image if exists and is in storage folder
+            if ($product->image_url && str_starts_with($product->image_url, '/storage/')) {
+                $path = str_replace('/storage/', '', $product->image_url);
+                Storage::disk('public')->delete($path);
+            }
+
+            $product->delete();
+
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Product deleted successfully!');
+        } catch (\Exception $e) {
+            Log::error('Product deletion failed: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Failed to delete product: ' . $e->getMessage());
+        }
     }
 }
