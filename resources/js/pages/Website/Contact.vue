@@ -100,7 +100,7 @@ const submitContactForm = () => {
           <!-- Call Us -->
           <div class="contact-method bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 p-6 text-center">
             <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <i class="fas fa-phone-alt text-primary text-2xl"></i>
+              <i class="fas fa-phone-alt text-white text-2xl"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">Call Us</h3>
             <p class="text-gray-600 mb-4">Speak directly with our technical team</p>
@@ -110,7 +110,7 @@ const submitContactForm = () => {
           <!-- Email Us -->
           <div class="contact-method bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 p-6 text-center">
             <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <i class="fas fa-envelope text-primary text-2xl"></i>
+              <i class="fas fa-envelope text-white text-2xl"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">Email Us</h3>
             <p class="text-gray-600 mb-4">Get detailed information about our products</p>
@@ -120,7 +120,7 @@ const submitContactForm = () => {
           <!-- Visit Us -->
           <div class="contact-method bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 p-6 text-center">
             <div class="bg-primary bg-opacity-10 w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <i class="fas fa-map-marker-alt text-primary text-2xl"></i>
+              <i class="fas fa-map-marker-alt text-white text-2xl"></i>
             </div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">Visit Us</h3>
             <p class="text-gray-600 mb-4">Schedule a visit to our facilities</p>
