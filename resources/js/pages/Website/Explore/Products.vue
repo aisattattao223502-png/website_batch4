@@ -205,7 +205,17 @@
                   :key="product.id"
                   class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-2xl transition-shadow duration-300" data-aos="fade-up"
                 >
-                  <div class="h-48 sm:h-56 md:h-64 bg-white bg-no-repeat bg-contain bg-center relative" :style="{ backgroundImage: `url(${product.image_url})` }">
+                  <div class="h-48 sm:h-56 md:h-64 bg-white bg-no-repeat bg-contain bg-center relative">
+                    <img 
+                      v-if="product.image_url" 
+                      :src="product.image_url" 
+                      :alt="product.name"
+                      @error="handleImageError"
+                      class="w-full h-full object-contain"
+                    />
+                    <div v-else class="w-full h-full flex items-center justify-center bg-gray-100">
+                      <i class="fas fa-image text-gray-300 text-4xl"></i>
+                    </div>
                     <span :class="[
                       'absolute top-3 sm:top-4 right-3 sm:right-4 rounded-full px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold uppercase text-white',
                       getMaterialBadgeColor(product.material_type)
@@ -273,13 +283,13 @@
             </p>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <div v-if="services && services.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             <div 
               v-for="service in services" 
               :key="service.id"
               class="bg-white rounded-lg shadow-md hover:shadow-2xl transition-shadow duration-300 overflow-hidden"
             >
-              <div class="h-40 sm:h-44 md:h-48 bg-gray-200 bg-cover bg-center" :style="{ backgroundImage: `url(${service.image_url})` }"></div>
+              <div class="h-40 sm:h-44 md:h-48 bg-gray-200 bg-cover bg-center" :style="{ backgroundImage: `url(/storage/${service.image_url})` }"></div>
               <div class="p-4 sm:p-6">
                 <div class="flex items-center mb-2 sm:mb-3">
                   <div class="bg-blue-600 bg-opacity-10 p-1.5 sm:p-2 rounded-full mr-2 sm:mr-3 flex-shrink-0">
@@ -295,6 +305,15 @@
                   Learn More <i class="fas fa-arrow-right ml-2"></i>
                 </button>
               </div>
+            </div>
+          </div>
+
+          <!-- No Services Message -->
+          <div v-else class="text-center py-8">
+            <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+              <i class="fas fa-cogs text-4xl sm:text-5xl text-gray-300 mb-3 sm:mb-4"></i>
+              <h3 class="text-xl sm:text-2xl font-bold text-gray-700 mb-2">No Services Available</h3>
+              <p class="text-sm sm:text-base text-gray-500">Check back soon for our services.</p>
             </div>
           </div>
         </div>
@@ -354,10 +373,16 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
               <div>
-                <div 
-                  class="h-48 sm:h-56 md:h-64 bg-gray-200 bg-cover bg-center rounded-lg mb-4"
-                  :style="{ backgroundImage: `url(${selectedProduct?.image_url})` }"
-                ></div>
+                <div class="h-48 sm:h-56 md:h-64 bg-gray-200 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                  <img 
+                    v-if="selectedProduct?.image_url" 
+                    :src="selectedProduct.image_url" 
+                    :alt="selectedProduct.name"
+                    @error="handleImageError"
+                    class="w-full h-full object-contain"
+                  />
+                  <i v-else class="fas fa-image text-gray-300 text-4xl"></i>
+                </div>
               </div>
               <div>
                 <h4 class="text-base sm:text-lg font-semibold mb-2">Description</h4>
@@ -1100,51 +1125,13 @@ const products = [
   }
 ];
 
-// Services data
-const services = [
-  {
-    id: 1,
-    name: 'Ultrasonic Welding Services',
-    description: 'High-powered ultrasonic welding for sealing plastic parts with precision and consistency.',
-    image_url: '/storage/assets/img/services/Ultrasonic.webp',
-    youtube_url: 'https://youtu.be/2mDk5121I8E'
-  },
-  {
-    id: 2,
-    name: 'Sub-Assembly Services',
-    description: 'Complete assembly of plastic-to-plastic, plastic-to-rubber, and plastic-to-metal components.',
-    image_url: '/storage/assets/img/services/Assembly.webp',
-    youtube_url: 'https://youtu.be/cXbxFFckDTg'
-  },
-  {
-    id: 6,
-    name: 'Precision CNC & Mold Solutions',
-    description: 'Vertical milling machining center (VMC) / CNC machining, mold design & mold fabrication using latest technology & conventional machines',
-    image_url: '/storage/assets/img/services/Precision.jpg',
-    youtube_url: 'https://youtu.be/alYxZuHd7M4'
-  },
-  {
-    id: 9,
-    name: 'Rubber Compression Molding',
-    description: 'A heat-and-pressure-based process ensuring durability and structural integrity of molded rubber parts.',
-    image_url: '/storage/assets/img/services/Compression.jpg',
-    youtube_url: 'https://youtu.be/WcLgX740a8U'
-  },
-  {
-    id: 10,
-    name: 'Silkscreen Printing',
-    description: 'Manual and automatic silkscreen printing solutions for plastic-injected parts and bottles with vibrant, lasting finishes.',
-    image_url: '/storage/assets/img/services/Silkscreen.jpg',
-    youtube_url: ''
-  },
-  {
-    id: 11,
-    name: '3D Rapid Prototyping',
-    description: 'Fast and accurate 3D printed prototypes for validating plastic injection and rubber compression designs before full-scale production.',
-    image_url: '/storage/assets/img/services/3D.jpg',
-    youtube_url: 'https://youtu.be/R4bsubxG4UY'
-  }
-];
+// Define props to receive services from backend
+const props = defineProps({
+    services: {
+        type: Array,
+        default: () => []
+    }
+});
 
 // Computed properties
 const filteredProducts = computed(() => {

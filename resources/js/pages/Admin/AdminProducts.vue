@@ -64,7 +64,6 @@ const handleDeleteClick = (product) => {
 
 const confirmDelete = () => {
   if (productToDelete.value) {
-    // This will be connected to backend later
     router.delete(`/admin/products/${productToDelete.value.id}`, {
       onSuccess: () => {
         showDeleteDialog.value = false;
@@ -77,15 +76,6 @@ const confirmDelete = () => {
 const cancelDelete = () => {
   showDeleteDialog.value = false;
   productToDelete.value = null;
-};
-
-const handleFormSubmit = (formData) => {
-  // This will be connected to backend later
-  if (props.action === 'create') {
-    router.post('/admin/products', formData);
-  } else if (props.action === 'edit') {
-    router.put(`/admin/products/${props.product.id}`, formData);
-  }
 };
 
 // Close alert after 5 seconds
@@ -176,7 +166,6 @@ if (showAlert.value) {
       <ProductForm
         :product="product"
         :is-edit="action === 'edit'"
-        @submit="handleFormSubmit"
         @cancel="handleBack"
       />
     </div>
@@ -227,5 +216,5 @@ if (showAlert.value) {
       @confirm="confirmDelete"
       @cancel="cancelDelete"
     />
-  </AdminLayout>
+  </AdminLayout>    
 </template>

@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, watch } from 'vue';
+import { useForm, router } from '@inertiajs/vue3';
 
 const props = defineProps({
   product: {
@@ -12,36 +13,44 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['submit', 'cancel']);
+const emit = defineEmits(['cancel']);
 
-// Form data
-const form = ref({
+// Initialize form
+const form = useForm({
   name: props.product?.name || '',
   description: props.product?.description || '',
-  category: props.product?.category || '',
-  image: null,
-  currentImage: props.product?.image_url || null
+  category: props.product?.category || 'appliance',
+  material_type: props.product?.material_type || 'plastic',
+  image_url: props.product?.image_url || '',
+  features: props.product?.features || []
 });
 
+// Image handling
+const imageFile = ref(null);
 const imagePreview = ref(props.product?.image_url || null);
 
-// Categories
-const categories = [
-  { value: 'thermoplastic', label: 'Thermoplastic Elastomers' },
-  { value: 'engineering', label: 'Engineering Plastics' },
-  { value: 'custom', label: 'Custom Compounds' },
-  { value: 'appliance', label: 'Appliance' },
-  { value: 'automotive', label: 'Automotive' },
-  { value: 'industrial', label: 'Industrial' }
-];
+// Features handling
+const featureInput = ref('');
+const features = ref([...(props.product?.features || [])]);
 
-// Handle image selection
+// Watch for product changes
+watch(() => props.product, (newProduct) => {
+  if (newProduct) {
+    form.name = newProduct.name || '';
+    form.description = newProduct.description || '';
+    form.category = newProduct.category || 'appliance';
+    form.material_type = newProduct.material_type || 'plastic';
+    form.image_url = newProduct.image_url || '';
+    form.features = newProduct.features || [];
+    features.value = [...(newProduct.features || [])];
+    imagePreview.value = newProduct.image_url || null;
+  }
+}, { immediate: true });
+
 const handleImageChange = (event) => {
   const file = event.target.files[0];
   if (file) {
-    form.value.image = file;
-    
-    // Create preview
+    imageFile.value = file;
     const reader = new FileReader();
     reader.onload = (e) => {
       imagePreview.value = e.target.result;
@@ -50,166 +59,207 @@ const handleImageChange = (event) => {
   }
 };
 
-// Remove image
-const removeImage = () => {
-  form.value.image = null;
-  imagePreview.value = form.value.currentImage;
-  
-  // Reset file input
-  const fileInput = document.getElementById('product_image');
-  if (fileInput) fileInput.value = '';
-};
-
-// Handle form submission
-const handleSubmit = () => {
-  // Basic validation
-  if (!form.value.name || !form.value.description || !form.value.category) {
-    alert('Please fill in all required fields');
-    return;
+const addFeature = () => {
+  if (featureInput.value.trim()) {
+    features.value.push(featureInput.value.trim());
+    featureInput.value = '';
   }
-  
-  emit('submit', form.value);
 };
 
-const handleCancel = () => {
+const removeFeature = (index) => {
+  features.value.splice(index, 1);
+};
+
+const handleSubmit = () => {
+  // Create FormData for file upload
+  const formData = new FormData();
+  formData.append('name', form.name);
+  formData.append('description', form.description || '');
+  formData.append('category', form.category);
+  formData.append('material_type', form.material_type);
+  
+  // Append features as array
+  features.value.forEach((feature, index) => {
+    formData.append(`features[${index}]`, feature);
+  });
+
+  // Append image if changed
+  if (imageFile.value) {
+    formData.append('image', imageFile.value);
+  } else if (form.image_url) {
+    formData.append('image_url', form.image_url);
+  }
+
+  if (props.isEdit) {
+    // For update, use POST with _method override
+    formData.append('_method', 'PUT');
+    router.post(route('admin.products.update', props.product.id), formData, {
+      forceFormData: true,
+      preserveScroll: true
+    });
+  } else {
+    // For create
+    router.post(route('admin.products.store'), formData, {
+      forceFormData: true,
+      preserveScroll: true
+    });
+  }
+};
+
+const cancel = () => {
   emit('cancel');
 };
 </script>
 
 <template>
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <div class="p-6 sm:p-8">
-      <form @submit.prevent="handleSubmit" class="space-y-6">
-        <!-- Product Name & Category Row -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Product Name -->
-          <div>
-            <label for="product_name" class="block text-sm font-semibold text-gray-700 mb-2">
-              Product Name <span class="text-red-500">*</span>
-            </label>
-            <input
-              id="product_name"
-              v-model="form.name"
-              type="text"
-              required
-              placeholder="Enter product name"
-              class="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            />
-          </div>
+  <div class="bg-white rounded-lg shadow-sm p-6">
+    <form @submit.prevent="handleSubmit" class="space-y-6">
+      <!-- Product Name -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Product Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          v-model="form.name"
+          type="text"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Enter product name"
+          required
+        />
+        <p v-if="form.errors.name" class="mt-1 text-sm text-red-600">{{ form.errors.name }}</p>
+      </div>
 
-          <!-- Category -->
-          <div>
-            <label for="product_category" class="block text-sm font-semibold text-gray-700 mb-2">
-              Category <span class="text-red-500">*</span>
-            </label>
-            <select
-              id="product_category"
-              v-model="form.category"
-              required
-              class="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-            >
-              <option value="">Select Category</option>
-              <option
-                v-for="cat in categories"
-                :key="cat.value"
-                :value="cat.value"
-              >
-                {{ cat.label }}
-              </option>
-            </select>
-          </div>
-        </div>
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Description
+        </label>
+        <textarea
+          v-model="form.description"
+          rows="4"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Enter product description"
+        ></textarea>
+        <p v-if="form.errors.description" class="mt-1 text-sm text-red-600">{{ form.errors.description }}</p>
+      </div>
 
-        <!-- Description -->
+      <!-- Category and Material Type -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label for="product_description" class="block text-sm font-semibold text-gray-700 mb-2">
-            Description <span class="text-red-500">*</span>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Category <span class="text-red-500">*</span>
           </label>
-          <textarea
-            id="product_description"
-            v-model="form.description"
-            rows="5"
+          <select
+            v-model="form.category"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
-            placeholder="Enter product description"
-            class="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all resize-none"
-          ></textarea>
-          <p class="text-xs text-gray-500 mt-1">{{ form.description.length }} characters</p>
+          >
+            <option value="appliance">Appliance Parts</option>
+            <option value="automotive">Automotive Parts</option>
+            <option value="industrial">Industrial Components</option>
+          </select>
+          <p v-if="form.errors.category" class="mt-1 text-sm text-red-600">{{ form.errors.category }}</p>
         </div>
 
-        <!-- Image Upload -->
         <div>
-          <label for="product_image" class="block text-sm font-semibold text-gray-700 mb-2">
-            Product Image
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Material Type <span class="text-red-500">*</span>
           </label>
-
-          <!-- Current Image Preview (Edit Mode) -->
-          <div v-if="imagePreview" class="mb-4">
-            <div class="relative inline-block">
-              <img
-                :src="imagePreview.startsWith('data:') ? imagePreview : `/${imagePreview}`"
-                alt="Product preview"
-                class="h-32 w-auto border-2 border-gray-200 rounded-lg shadow-sm"
-              />
-              <button
-                type="button"
-                @click="removeImage"
-                class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md transition-colors"
-              >
-                <i class="fas fa-times text-xs"></i>
-              </button>
-            </div>
-            <p class="text-sm text-gray-600 mt-2">
-              {{ isEdit ? 'Current Image' : 'Selected Image' }}
-            </p>
-          </div>
-
-          <!-- File Input -->
-          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
-            <input
-              id="product_image"
-              type="file"
-              accept="image/jpeg,image/png,image/gif,image/jpg"
-              @change="handleImageChange"
-              class="hidden"
-            />
-            <label
-              for="product_image"
-              class="cursor-pointer flex flex-col items-center"
-            >
-              <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
-              <p class="text-sm font-medium text-gray-700 mb-1">
-                Click to upload or drag and drop
-              </p>
-              <p class="text-xs text-gray-500">
-                {{ isEdit ? 'Upload a new image to replace the current one' : 'JPG, PNG or GIF (Max 5MB)' }}
-              </p>
-            </label>
-          </div>
-
-          <p class="text-xs text-gray-500 mt-2">
-            <i class="fas fa-info-circle mr-1"></i>
-            Supported formats: JPG, JPEG, PNG, GIF. Maximum file size: 5MB.
-          </p>
+          <select
+            v-model="form.material_type"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          >
+            <option value="plastic">Plastic</option>
+            <option value="rubber">Rubber</option>
+            <option value="custom">Custom</option>
+          </select>
+          <p v-if="form.errors.material_type" class="mt-1 text-sm text-red-600">{{ form.errors.material_type }}</p>
         </div>
+      </div>
 
-        <!-- Form Actions -->
-        <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-4 border-t border-gray-200">
+      <!-- Image Upload -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Product Image
+        </label>
+        <div class="space-y-4">
+          <input
+            type="file"
+            @change="handleImageChange"
+            accept="image/*"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <div v-if="imagePreview" class="relative w-48 h-48 border-2 border-gray-300 rounded-lg overflow-hidden">
+            <img :src="imagePreview" alt="Preview" class="w-full h-full object-contain" />
+          </div>
+        </div>
+        <p v-if="form.errors.image_url" class="mt-1 text-sm text-red-600">{{ form.errors.image_url }}</p>
+      </div>
+
+      <!-- Features -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Features
+        </label>
+        <div class="flex gap-2 mb-3">
+          <input
+            v-model="featureInput"
+            type="text"
+            @keyup.enter="addFeature"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter a feature and press Enter"
+          />
           <button
             type="button"
-            @click="handleCancel"
-            class="w-full sm:w-auto px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition-colors"
+            @click="addFeature"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
           >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-red-600 hover:from-red-600 hover:to-blue-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
-          >
-            <i :class="['fas mr-2', isEdit ? 'fa-save' : 'fa-plus']"></i>
-            {{ isEdit ? 'Update Product' : 'Add Product' }}
+            <i class="fas fa-plus"></i>
           </button>
         </div>
-      </form>
-    </div>
+        <div v-if="features.length > 0" class="space-y-2">
+          <div
+            v-for="(feature, index) in features"
+            :key="index"
+            class="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg"
+          >
+            <span class="text-sm text-gray-700">{{ feature }}</span>
+            <button
+              type="button"
+              @click="removeFeature(index)"
+              class="text-red-600 hover:text-red-800"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <p v-if="form.errors.features" class="mt-1 text-sm text-red-600">{{ form.errors.features }}</p>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end gap-4 pt-4 border-t">
+        <button
+          type="button"
+          @click="cancel"
+          class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          :disabled="form.processing"
+          class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span v-if="form.processing">
+            <i class="fas fa-spinner fa-spin mr-2"></i>
+            {{ isEdit ? 'Updating...' : 'Creating...' }}
+          </span>
+          <span v-else>
+            {{ isEdit ? 'Update Product' : 'Create Product' }}
+          </span>
+        </button>
+      </div>
+    </form>
   </div>
 </template>

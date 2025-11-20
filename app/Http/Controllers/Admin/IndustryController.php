@@ -4,81 +4,105 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Industry;
-use App\Http\Requests\StoreIndustryRequest;
-use App\Http\Requests\UpdateIndustryRequest;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class IndustryController extends Controller
 {
     public function index()
     {
-        $industries = Industry::orderBy('name', 'asc')->get();
+        $industries = Industry::orderBy('name')->get();
         
         return Inertia::render('Admin/AdminIndustries', [
             'industries' => $industries,
-            'mode' => 'list',
+            'mode' => 'list'
         ]);
     }
 
     public function create()
     {
         return Inertia::render('Admin/AdminIndustries', [
-            'industries' => [],
-            'mode' => 'create',
+            'industries' => Industry::orderBy('name')->get(),
+            'mode' => 'create'
         ]);
     }
 
-    public function store(StoreIndustryRequest $request)
+    public function store(Request $request)
     {
-        $validated = $request->validated();
-        
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'description' => 'required|string',
+            'icon_class' => 'nullable|string|max:50',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'coming_soon' => 'boolean'
+        ]);
+
+        $data = [
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'icon_class' => $validated['icon_class'] ?? '',
+            'coming_soon' => $request->boolean('coming_soon')
+        ];
+
         // Handle image upload
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('assets', $filename, 'public');
-            $validated['image_url'] = $filename;
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('storage/assets/img/industries'), $filename);
+            $data['image_url'] = 'assets/img/industries/' . $filename;
         }
-        
-        $validated['coming_soon'] = $request->boolean('coming_soon');
-        
-        Industry::create($validated);
-        
+
+        Industry::create($data);
+
         return redirect()->route('admin.industries.index')
             ->with('success', 'Industry added successfully!');
     }
 
     public function edit(Industry $industry)
     {
-        return Inertia::render('Admin/Industries', [
-            'industries' => [],
+        return Inertia::render('Admin/AdminIndustries', [
+            'industries' => Industry::orderBy('name')->get(),
             'industry' => $industry,
-            'mode' => 'edit',
+            'mode' => 'edit'
         ]);
     }
 
-    public function update(UpdateIndustryRequest $request, Industry $industry)
+    public function update(Request $request, Industry $industry)
     {
-        $validated = $request->validated();
-        
-        // Handle image upload
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'description' => 'required|string',
+            'icon_class' => 'nullable|string|max:50',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'coming_soon' => 'boolean'
+        ]);
+
+        $data = [
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'icon_class' => $validated['icon_class'] ?? '',
+            'coming_soon' => $request->boolean('coming_soon')
+        ];
+
+        // Handle new image upload
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($industry->image_url) {
-                Storage::disk('public')->delete('assets/' . $industry->image_url);
+                $oldImagePath = public_path('storage/' . $industry->image_url);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
             }
-            
+
             $image = $request->file('image');
-            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('assets', $filename, 'public');
-            $validated['image_url'] = $filename;
+            $filename = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('storage/assets/img/industries'), $filename);
+            $data['image_url'] = 'assets/img/industries/' . $filename;
         }
-        
-        $validated['coming_soon'] = $request->boolean('coming_soon');
-        
-        $industry->update($validated);
-        
+
+        $industry->update($data);
+
         return redirect()->route('admin.industries.index')
             ->with('success', 'Industry updated successfully!');
     }
@@ -87,11 +111,14 @@ class IndustryController extends Controller
     {
         // Delete image if exists
         if ($industry->image_url) {
-            Storage::disk('public')->delete('assets/' . $industry->image_url);
+            $imagePath = public_path('storage/' . $industry->image_url);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
         }
-        
+
         $industry->delete();
-        
+
         return redirect()->route('admin.industries.index')
             ->with('success', 'Industry deleted successfully!');
     }
