@@ -374,7 +374,11 @@ const closeDropdowns = () => {
 };
 
 const startTextTransition = () => {
-}
+  textTransitionInterval = setInterval(() => {
+    showMainText.value = !showMainText.value;
+  }, 3000); // change every 3 seconds
+};
+
 const stopTextTransition = () => {
   if (textTransitionInterval) {
     clearInterval(textTransitionInterval);
