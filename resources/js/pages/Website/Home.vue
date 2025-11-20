@@ -263,7 +263,7 @@
             >
               <!-- Customer Logos -->
               <div
-                v-for="(logo, index) in allCustomerLogos.value || allCustomerLogos"
+                v-for="(logo, index) in allCustomerLogos"
                 :key="index"
                 class="flex-shrink-0 px-4"
                 :style="{ width: `${cardWidth}px` }"
@@ -362,6 +362,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useHead } from '@vueuse/head'; // for Search Engine Optimization (SEO)
 import { OrbitSpinner } from "epic-spinners"; // Loading Spinner
 import { router } from "@inertiajs/vue3";
+
 
 import Header from '@/layouts/Header.vue';
 import Footer from '@/layouts/Footer.vue';
@@ -489,8 +490,10 @@ useHead({
   ]
 });
 
-const heading = computed(() => props.customersHeading);
-const subheading = computed(() => props.customersSubheading);
+const heading = ref("Our Valued Customers");
+const subheading = ref(
+  "We're proud to partner with industry leaders across various sectors, providing them with high-performance polymer solutions."
+);
 
 // Add this to your Home.vue script setup section
 const props = defineProps({
@@ -501,21 +504,8 @@ const props = defineProps({
   services: {
     type: Array,
     default: () => []
-  },
-  customers: {
-    type: Array,
-    default: () => []
-  },
-  customersHeading: {
-    type: String,
-    default: 'Our Valued Customers'
-  },
-  customersSubheading: {
-    type: String,
-    default: "We're proud to partner with industry leaders."
   }
 });
-
 const layout = ref([
   [ 1],
   [2, 3, null],
@@ -524,10 +514,24 @@ const layout = ref([
   [11, 12, 13, 14, 15],
 ]);
 
-// Customer logos from backend
-const allCustomerLogos = computed(() => {
-  return props.customers.map(customer => `storage/${customer.logo_url}`);
-});
+// Customer logos array
+const allCustomerLogos = [
+  "storage/assets/home/3M.png",
+  "storage/assets/home/Unilab.png",
+  "storage/assets/home/APC.png",
+  "storage/assets/home/Carrier.png",
+  "storage/assets/home/Panasonic.png",
+  "storage/assets/home/Koppel.png",
+  "storage/assets/home/Dutch.png",
+  "storage/assets/home/WB.png",
+  "storage/assets/home/ACS.png",
+  "storage/assets/home/Purefoods.png",
+  "storage/assets/home/Condura.png",
+  "storage/assets/home/Continental.png",
+  "storage/assets/home/soon.jpg",
+  "storage/assets/home/soon.jpg",
+  "storage/assets/home/soon.jpg",
+];
 
 // Carousel state
 const currentSlide = ref(0);
@@ -536,7 +540,7 @@ const visibleCards = ref(4); // Number of visible cards at once
 
 // Computed properties
 const slideWidth = computed(() => cardWidth.value);
-const maxSlide = computed(() => Math.max(0, allCustomerLogos.value.length - visibleCards.value));
+const maxSlide = computed(() => Math.max(0, allCustomerLogos.length - visibleCards.value));
 const progress = computed(() => {
   if (maxSlide.value === 0) return 100;
   return ((currentSlide.value / maxSlide.value) * 100);
@@ -581,7 +585,7 @@ const visitorCount = ref(0)
 
 const fetchVisitorCount = async () => {
   try {
-    const res = await axios.get('/api/visitors/count')
+    const res = await axios.get('/visitors/get')
     visitorCount.value = res.data.count
   } catch (err) {
     console.error('Error fetching visitor count:', err)
@@ -590,7 +594,7 @@ const fetchVisitorCount = async () => {
 
 const incrementVisitorCount = async () => {
   try {
-    const res = await axios.post('/api/visitors/increment')
+    const res = await axios.post('/visitors/increment')
     visitorCount.value = res.data.count
   } catch (err) {
     console.error('Error incrementing visitor count:', err)

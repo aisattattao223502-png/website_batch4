@@ -127,6 +127,15 @@
                 jamespro_asia@yahoo.com
               </a>
             </li>
+            <li class="flex items-start">
+              <i class="fas fa-envelope mt-1 mr-3 text-blue-400"></i>
+              <a
+                href="mailto:jamespolymers.international@gmail.com"
+                class="text-gray-300 hover:text-white transition-colors"
+              >
+                jamespolymers.international<br>@gmail.com</br>
+              </a>
+            </li>
           </ul>
         </div>
       </div>

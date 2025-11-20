@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\AdminUsersController;
+use App\Http\Controllers\Admin\AdminUsersController; // PLEASE DONT CHANGE THIS SHIT
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 
