@@ -2,6 +2,29 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 
+const handleLogout = async () => {
+  try {
+    const response = await fetch('/admin/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+      }
+    });
+
+    if (response.ok) {
+      // Force reload to clear any cached data
+      window.location.href = '/admin/login';
+    } else {
+      console.error('Logout failed');
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    // Even on error, redirect to login
+    window.location.href = '/admin/login';
+  }
+};
+
 const page = usePage();
 const sidebarOpen = ref(false);
 
@@ -135,13 +158,15 @@ const isActive = (routeName) => {
         </div>
         
         <!-- Logout Button -->
-        <Link
-          href="/admin/login"
-          class="flex items-center justify-center w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-200 font-medium text-sm"
-        >
-          <i class="fas fa-sign-out-alt mr-2"></i>
-          <span>Logout</span>
-        </Link>
+        <form @submit.prevent="handleLogout" method="POST" class="mt-4">
+          <button
+            type="submit"
+            class="flex items-center justify-center w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-200 font-medium text-sm"
+          >
+            <i class="fas fa-sign-out-alt mr-2"></i>
+            <span>Logout</span>
+          </button>
+        </form>
       </div>
     </aside>
 

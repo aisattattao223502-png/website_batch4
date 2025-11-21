@@ -44,10 +44,15 @@ class AuthController extends Controller
         ], 401);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Session::flush();
-        return redirect()->route('admin.login');
+        
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+        
+        return redirect()->route('admin.login')->with('success', 'Logged out successfully');
     }
 
     public function check()
