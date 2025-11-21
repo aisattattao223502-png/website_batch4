@@ -1,136 +1,136 @@
 <template>
-  <Teleport to="body">
-    <Transition name="modal">
-      <div
-        v-if="show && inquiry"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-        @click.self="closeModal"
-      >
-        <div class="bg-white rounded-lg p-6 max-w-2xl w-full shadow-xl max-h-[90vh] overflow-y-auto">
-          <h3 class="text-xl font-bold text-gray-800 mb-4">Reply to Inquiry</h3>
-          
-          <form @submit.prevent="handleSubmit">
-            <div class="mb-4">
-              <label for="reply_to" class="block text-sm font-medium text-gray-700 mb-1">
-                To
-              </label>
-              <input
-                id="reply_to"
-                type="email"
-                :value="inquiry.email"
-                class="w-full rounded-lg border-gray-300 p-2 border bg-gray-50"
-                readonly
-              />
-            </div>
+  <transition name="modal">
+    <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <!-- Backdrop -->
+        <div 
+          class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+          @click="$emit('close')"
+        ></div>
 
+        <!-- Modal -->
+        <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 z-10">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold text-gray-900">
+              Reply to Inquiry
+            </h3>
+            <button
+              @click="$emit('close')"
+              class="text-gray-400 hover:text-gray-600"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <!-- Original Inquiry Info -->
+          <div v-if="inquiry" class="bg-gray-50 p-4 rounded-lg mb-4">
+            <p class="text-sm text-gray-600 mb-1">
+              <strong>From:</strong> {{ inquiry.name }} ({{ inquiry.email }})
+            </p>
+            <p class="text-sm text-gray-600 mb-1">
+              <strong>Subject:</strong> {{ inquiry.subject }}
+            </p>
+            <p class="text-sm text-gray-600">
+              <strong>Message:</strong> {{ inquiry.message }}
+            </p>
+          </div>
+
+          <!-- Reply Form -->
+          <form @submit.prevent="submitReply">
             <div class="mb-4">
-              <label for="reply_subject" class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
                 Subject
               </label>
               <input
-                id="reply_subject"
                 v-model="form.subject"
                 type="text"
-                class="w-full rounded-lg border-gray-300 p-2 border focus:ring-blue-600 focus:border-blue-600"
                 required
+                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Re: Your inquiry..."
               />
-              <div v-if="form.errors.subject" class="text-red-500 text-sm mt-1">
-                {{ form.errors.subject }}
-              </div>
             </div>
 
-            <div class="mb-4">
-              <label for="reply_message" class="block text-sm font-medium text-gray-700 mb-1">
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
                 Message
               </label>
               <textarea
-                id="reply_message"
                 v-model="form.message"
                 rows="6"
-                class="w-full rounded-lg border-gray-300 p-2 border focus:ring-blue-600 focus:border-blue-600"
                 required
+                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Write your reply..."
               ></textarea>
-              <div v-if="form.errors.message" class="text-red-500 text-sm mt-1">
-                {{ form.errors.message }}
-              </div>
             </div>
 
-            <div class="flex justify-end space-x-3">
+            <div class="flex gap-3 justify-end">
               <button
                 type="button"
-                @click="closeModal"
-                class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-lg transition"
-                :disabled="form.processing"
+                @click="$emit('close')"
+                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition disabled:opacity-50"
-                :disabled="form.processing"
+                :disabled="processing"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50"
               >
-                <i class="fas fa-paper-plane mr-2"></i>
-                {{ form.processing ? 'Sending...' : 'Send Reply' }}
+                {{ processing ? 'Sending...' : 'Send Reply' }}
               </button>
             </div>
           </form>
         </div>
       </div>
-    </Transition>
-  </Teleport>
+    </div>
+  </transition>
 </template>
 
 <script setup>
-import { watch } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  inquiry: {
-    type: Object,
-    default: null,
-  },
+  show: Boolean,
+  inquiry: Object
 });
 
 const emit = defineEmits(['close', 'send']);
 
-const form = useForm({
+const form = ref({
   subject: '',
-  message: '',
+  message: ''
 });
+
+const processing = ref(false);
 
 watch(() => props.inquiry, (newInquiry) => {
   if (newInquiry) {
-    form.subject = `Re: ${newInquiry.subject}`;
-    form.message = '';
+    form.value.subject = `Re: ${newInquiry.subject}`;
+    form.value.message = '';
   }
-}, { immediate: true });
+});
 
-const closeModal = () => {
-  form.reset();
-  form.clearErrors();
-  emit('close');
-};
-
-const handleSubmit = () => {
+const submitReply = () => {
+  if (!form.value.subject || !form.value.message) return;
+  
+  processing.value = true;
   emit('send', {
-    subject: form.subject,
-    message: form.message,
+    subject: form.value.subject,
+    message: form.value.message
   });
+  
+  setTimeout(() => {
+    processing.value = false;
+    form.value = { subject: '', message: '' };
+  }, 1000);
 };
 </script>
 
 <style scoped>
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
+.modal-enter-active, .modal-leave-active {
+  transition: opacity 0.3s;
 }
-
-.modal-enter-from,
-.modal-leave-to {
+.modal-enter-from, .modal-leave-to {
   opacity: 0;
 }
 </style>

@@ -1,72 +1,72 @@
 <template>
-  <Teleport to="body">
-    <Transition name="modal">
-      <div
-        v-if="show"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-        @click.self="$emit('cancel')"
-      >
-        <div class="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
-          <h3 class="text-xl font-bold text-gray-800 mb-4">{{ title }}</h3>
-          <p class="text-gray-600 mb-6">{{ message }}</p>
-          <div class="flex justify-end space-x-3">
-            <button
-              @click="$emit('cancel')"
-              class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-lg transition"
-            >
-              Cancel
-            </button>
-            <button
-              @click="$emit('confirm')"
-              :class="[
-                'text-white py-2 px-4 rounded-lg transition',
-                confirmClass || 'bg-blue-500 hover:bg-blue-600'
-              ]"
-            >
-              {{ confirmText }}
-            </button>
+  <transition name="modal">
+    <div v-if="show" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <!-- Backdrop -->
+        <div 
+          class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+          @click="$emit('cancel')"
+        ></div>
+
+        <!-- Modal -->
+        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6 z-10">
+          <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+              <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">
+              {{ title }}
+            </h3>
+            
+            <p class="text-gray-600 mb-6">
+              {{ message }}
+            </p>
+
+            <div class="flex gap-3 justify-center">
+              <button
+                @click="$emit('cancel')"
+                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                @click="$emit('confirm')"
+                :class="[confirmClass, 'px-4 py-2 text-white rounded-lg transition']"
+              >
+                {{ confirmText }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </Transition>
-  </Teleport>
+    </div>
+  </transition>
 </template>
 
 <script setup>
 defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  message: {
-    type: String,
-    required: true,
-  },
+  show: Boolean,
+  title: String,
+  message: String,
   confirmText: {
     type: String,
-    default: 'Confirm',
+    default: 'Confirm'
   },
   confirmClass: {
     type: String,
-    default: '',
-  },
+    default: 'bg-red-500 hover:bg-red-600'
+  }
 });
 
 defineEmits(['confirm', 'cancel']);
 </script>
 
 <style scoped>
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
+.modal-enter-active, .modal-leave-active {
+  transition: opacity 0.3s;
 }
-
-.modal-enter-from,
-.modal-leave-to {
+.modal-enter-from, .modal-leave-to {
   opacity: 0;
 }
 </style>
