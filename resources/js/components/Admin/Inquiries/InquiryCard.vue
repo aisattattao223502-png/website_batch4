@@ -1,91 +1,93 @@
 <template>
-  <div
-    :class="[
-      'inquiry-card p-6 border-b border-gray-200 transition-all duration-300 hover:shadow-lg',
-      statusClass
-    ]"
-  >
-    <div class="flex flex-col md:flex-row justify-between">
+  <div class="border-b border-gray-200 p-6 hover:bg-gray-50 transition">
+    <div class="flex items-start justify-between">
       <div class="flex-1">
-        <!-- Name and Email -->
-        <div class="flex flex-col sm:flex-row sm:items-center mb-2 gap-1 sm:gap-3">
-          <h3 class="text-base sm:text-lg font-semibold text-gray-800">
-            {{ inquiry.name }}
-          </h3>
-          <span class="text-xs sm:text-sm text-gray-500 break-all">
-            {{ inquiry.email }}
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-3">
+          <span 
+            :class="[
+              'px-3 py-1 rounded-full text-xs font-semibold',
+              statusColors[inquiry.status]
+            ]"
+          >
+            {{ statusLabels[inquiry.status] }}
           </span>
-          <span v-if="inquiry.phone" class="text-xs sm:text-sm text-gray-500">
-            <i class="fas fa-phone-alt text-gray-400 mr-1"></i>
-            {{ inquiry.phone }}
+          <span 
+            :class="[
+              'px-2 py-1 rounded text-xs font-semibold',
+              priorityColors[inquiry.priority]
+            ]"
+          >
+            {{ inquiry.priority.toUpperCase() }}
           </span>
-        </div>
-
-        <!-- Meta Info -->
-        <div class="flex flex-wrap items-center gap-2 mb-2">
-          <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded-full">
-            {{ inquiry.subject }}
-          </span>
-          <span class="text-xs sm:text-sm text-gray-500">
-            <i class="far fa-clock text-gray-400 mr-1"></i>
+          <span class="text-sm text-gray-500">
             {{ formatDate(inquiry.date_submitted) }}
           </span>
-          <span v-if="inquiry.company" class="text-xs sm:text-sm text-gray-500">
-            <i class="far fa-building text-gray-400 mr-1"></i>
-            {{ inquiry.company }}
-          </span>
         </div>
 
-        <!-- Message -->
-        <div class="text-gray-600 mt-2">
-          <div v-if="!expanded && inquiry.message.length > 150">
-            {{ inquiry.message.substring(0, 150) }}...
-            <button
-              @click="expanded = true"
-              class="text-blue-600 hover:text-blue-700 text-sm mt-1"
-            >
-              Read more <i class="fas fa-chevron-down ml-1"></i>
-            </button>
+        <!-- Customer Info -->
+        <div class="mb-3">
+          <h3 class="text-lg font-semibold text-gray-900">{{ inquiry.name }}</h3>
+          <div class="flex flex-wrap gap-4 mt-1 text-sm text-gray-600">
+            <span class="flex items-center gap-1">
+              <i class="fas fa-envelope"></i>
+              {{ inquiry.email }}
+            </span>
+            <span class="flex items-center gap-1">
+              <i class="fas fa-phone"></i>
+              {{ inquiry.phone }}
+            </span>
+            <span v-if="inquiry.company" class="flex items-center gap-1">
+              <i class="fas fa-building"></i>
+              {{ inquiry.company }}
+            </span>
           </div>
-          <div v-else>
-            <p class="whitespace-pre-line">{{ inquiry.message }}</p>
-            <button
-              v-if="inquiry.message.length > 150"
-              @click="expanded = false"
-              class="text-blue-600 hover:text-blue-700 text-sm mt-1"
-            >
-              Show less <i class="fas fa-chevron-up ml-1"></i>
-            </button>
-          </div>
+        </div>
+
+        <!-- Subject & Message -->
+        <div class="mb-3">
+          <p class="font-medium text-gray-800 mb-1">{{ inquiry.subject }}</p>
+          <p class="text-gray-600 text-sm line-clamp-2">{{ inquiry.message }}</p>
         </div>
       </div>
 
       <!-- Actions -->
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center mt-4 md:mt-0 gap-2">
-        <select
-          :value="inquiry.status"
-          @change="$emit('update-status', inquiry.id, $event.target.value)"
-          class="w-full sm:w-auto rounded-lg border-gray-300 p-2 border text-xs sm:text-sm focus:ring-blue-600 focus:border-blue-600"
-        >
-          <option value="new">New</option>
-          <option value="in-progress">In Progress</option>
-          <option value="resolved">Resolved</option>
-          <option value="closed">Closed</option>
-        </select>
-
+      <div class="flex gap-2 ml-4">
         <button
           @click="$emit('reply', inquiry)"
-          class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white py-2 sm:py-1 px-3 rounded-lg transition text-xs sm:text-sm"
+          class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+          title="Reply"
         >
-          <i class="fas fa-reply mr-1"></i> Reply
+          <i class="fas fa-reply"></i>
         </button>
-
+        <button
+          @click="showStatusMenu = !showStatusMenu"
+          class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition relative"
+          title="Change Status"
+        >
+          <i class="fas fa-ellipsis-v"></i>
+          
+          <!-- Status Dropdown -->
+          <div 
+            v-if="showStatusMenu"
+            class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10"
+          >
+            <button
+              v-for="status in statuses"
+              :key="status.value"
+              @click="changeStatus(status.value)"
+              class="w-full text-left px-4 py-2 hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg"
+            >
+              {{ status.label }}
+            </button>
+          </div>
+        </button>
         <button
           @click="$emit('delete', inquiry)"
-          class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white py-2 sm:py-1 px-3 rounded-lg transition text-xs sm:text-sm"
+          class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+          title="Delete"
         >
-          <i class="fas fa-trash-alt mr-1 sm:mr-0"></i>
-          <span class="sm:hidden"> Delete</span>
+          <i class="fas fa-trash"></i>
         </button>
       </div>
     </div>
@@ -93,42 +95,63 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { format, parseISO } from 'date-fns';
+import { ref } from 'vue';
 
 const props = defineProps({
-  inquiry: {
-    type: Object,
-    required: true,
-  },
+  inquiry: Object
 });
 
-defineEmits(['update-status', 'delete', 'reply']);
+const emit = defineEmits(['update-status', 'delete', 'reply']);
 
-const expanded = ref(false);
+const showStatusMenu = ref(false);
 
-const statusClass = computed(() => {
-  const classes = {
-    'new': 'bg-blue-50 border-l-4 border-l-blue-500',
-    'in-progress': 'bg-yellow-50 border-l-4 border-l-yellow-500',
-    'resolved': 'bg-green-50 border-l-4 border-l-green-500',
-    'closed': 'bg-gray-50 border-l-4 border-l-gray-500',
-  };
-  return classes[props.inquiry.status] || classes.new;
-});
+const statusColors = {
+  'new': 'bg-blue-100 text-blue-800',
+  'in-progress': 'bg-yellow-100 text-yellow-800',
+  'resolved': 'bg-green-100 text-green-800',
+  'closed': 'bg-gray-100 text-gray-800'
+};
 
-const formatDate = (dateString) => {
-  try {
-    const date = parseISO(dateString);
-    return format(date, 'MMM d, yyyy h:mm a');
-  } catch (e) {
-    return dateString;
-  }
+const statusLabels = {
+  'new': 'New',
+  'in-progress': 'In Progress',
+  'resolved': 'Resolved',
+  'closed': 'Closed'
+};
+
+const priorityColors = {
+  'low': 'bg-gray-100 text-gray-700',
+  'medium': 'bg-orange-100 text-orange-700',
+  'high': 'bg-red-100 text-red-700'
+};
+
+const statuses = [
+  { value: 'new', label: 'Mark as New' },
+  { value: 'in-progress', label: 'Mark as In Progress' },
+  { value: 'resolved', label: 'Mark as Resolved' },
+  { value: 'closed', label: 'Mark as Closed' }
+];
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const changeStatus = (status) => {
+  emit('update-status', props.inquiry.id, status);
+  showStatusMenu.value = false;
 };
 </script>
 
 <style scoped>
-.inquiry-card:hover {
-  transform: translateY(-2px);
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

@@ -3,13 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inquiry;
+use App\Services\BrevoMailService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class ContactController extends Controller
 {
+    protected $brevoMail;
+
+    public function __construct(BrevoMailService $brevoMail)
+    {
+        $this->brevoMail = $brevoMail;
+    }
+
     public function index()
     {
         return Inertia::render('Website/Contact');
@@ -17,70 +25,94 @@ class ContactController extends Controller
 
     public function submit(Request $request)
     {
-        $validated = $request->validate([
-            'fullName' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'companyName' => 'nullable|string|max:255',
-            'position' => 'nullable|string|max:255',
-            'companyAddress' => 'required|string|max:500',
-            'subject' => 'required|string',
-            'priority' => 'required|string|in:low,medium,high',
-            'message' => 'required|string|max:5000',
-        ]);
+        Log::info('=== CONTACT FORM SUBMITTED ===');
+        Log::info('Request data:', $request->all());
 
         try {
-            // Store inquiry in database
+            $validated = $request->validate([
+                'fullName' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'phone' => 'required|string|max:50',
+                'companyName' => 'nullable|string|max:255',
+                'position' => 'nullable|string|max:255',
+                'companyAddress' => 'required|string|max:500',
+                'subject' => 'required|string|max:255',
+                'priority' => 'required|in:low,medium,high',
+                'message' => 'required|string|max:5000',
+            ]);
+
+            Log::info('Validation passed');
+
             $inquiry = Inquiry::create([
                 'name' => $validated['fullName'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
-                'company' => $validated['companyName'],
-                'position' => $validated['position'],
-                'company_address' => $validated['companyAddress'],
+                'company' => $validated['companyName'] ?? null,
+                'position' => $validated['position'] ?? null,
+                'address' => $validated['companyAddress'],
                 'subject' => $validated['subject'],
                 'priority' => $validated['priority'],
                 'message' => $validated['message'],
                 'status' => 'new',
-                'date_submitted' => now(),
+                'date_submitted' => Carbon::now(),
             ]);
 
-            // Send email notification to admin
-            $this->sendAdminNotification($inquiry);
+            Log::info('Inquiry created:', ['id' => $inquiry->id]);
 
-            // Send confirmation email to customer
-            $this->sendCustomerConfirmation($inquiry);
+            try {
+                $this->sendAdminNotification($inquiry);
+                Log::info('Admin notification email sent');
 
-            return redirect()->back()->with('success', 'Thank you for contacting us! We will get back to you soon.');
+                $this->sendCustomerConfirmation($inquiry);
+                Log::info('Customer confirmation email sent');
+
+            } catch (\Exception $emailException) {
+                Log::error('Email sending failed:', [
+                    'message' => $emailException->getMessage(),
+                    'inquiry_id' => $inquiry->id
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Thank you! Your inquiry has been submitted successfully. We will contact you soon.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed:', $e->errors());
+            return redirect()->back()->withErrors($e->errors())->withInput();
+            
         } catch (\Exception $e) {
-            Log::error('Contact form submission error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Sorry, there was an error sending your message. Please try again or contact us directly.');
+            Log::error('Error creating inquiry:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
+            return redirect()->back()->with('error', 'Something went wrong. Please try again.');
         }
     }
 
     private function sendAdminNotification($inquiry)
     {
-        try {
-            Mail::send('emails.admin-inquiry-notification', ['inquiry' => $inquiry], function ($message) use ($inquiry) {
-                $message->to(config('mail.admin_email', 'aisat.castillo222436@gmail.com'))
-                        ->subject('New Inquiry: ' . $inquiry->subject . ' [' . strtoupper($inquiry->priority) . ' Priority]');
-                $message->from(config('mail.from.address'), config('mail.from.name'));
-            });
-        } catch (\Exception $e) {
-            Log::error('Failed to send admin notification: ' . $e->getMessage());
-        }
+        $adminEmail = config('mail.admin_email', env('ADMIN_EMAIL'));
+        $htmlContent = view('emails.admin-inquiry-notification', ['inquiry' => $inquiry])->render();
+        
+        $this->brevoMail->sendEmail(
+            $adminEmail,
+            'Admin',
+            'New Contact Inquiry: ' . $inquiry->subject . ' [' . strtoupper($inquiry->priority) . ' Priority]',
+            $htmlContent,
+            ['email' => $inquiry->email, 'name' => $inquiry->name]
+        );
     }
 
     private function sendCustomerConfirmation($inquiry)
     {
-        try {
-            Mail::send('emails.customer-inquiry-confirmation', ['inquiry' => $inquiry], function ($message) use ($inquiry) {
-                $message->to($inquiry->email, $inquiry->name)
-                        ->subject('We received your inquiry - James Polymers');
-                $message->from(config('mail.from.address'), config('mail.from.name'));
-            });
-        } catch (\Exception $e) {
-            Log::error('Failed to send customer confirmation: ' . $e->getMessage());
-        }
+        $htmlContent = view('emails.customer-inquiry-confirmation', ['inquiry' => $inquiry])->render();
+        
+        $this->brevoMail->sendEmail(
+            $inquiry->email,
+            $inquiry->name,
+            'We received your inquiry - James Polymers Manufacturing Corporation',
+            $htmlContent
+        );
     }
 }

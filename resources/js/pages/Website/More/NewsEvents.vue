@@ -2,7 +2,143 @@
   <div>
     <Header :isHomepage="false" />
     
-    <div class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <!-- News Detail View -->
+    <div v-if="selectedArticle" class="bg-gray-100 min-h-screen">
+      <!-- Back Navigation -->
+      <div class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-4">
+          <Link href="/news-events" class="text-blue-700 hover:underline text-sm inline-flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i> Back to News & Events
+          </Link>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="container mx-auto px-4 py-10 max-w-4xl">
+        <!-- Title -->
+        <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-900 mb-3 leading-tight">
+          {{ selectedArticle.title }}
+        </h1>
+
+        <!-- Date -->
+        <div class="text-black text-lg font-medium mb-3">
+          {{ formatDate(selectedArticle.date) }}
+        </div>
+
+        <!-- Social Share -->
+        <div class="flex items-center text-gray-500 text-base mb-8 space-x-5">
+          <a href="#" class="hover:text-blue-600"><i class="fab fa-facebook fa-lg"></i></a>
+          <a href="#" class="hover:text-blue-600"><i class="fab fa-twitter fa-lg"></i></a>
+          <a href="#" class="hover:text-blue-600"><i class="fab fa-linkedin fa-lg"></i></a>
+          <a href="#" class="hover:text-blue-600"><i class="fab fa-instagram fa-lg"></i></a>
+        </div>
+
+        <!-- Media Carousel -->
+        <div v-if="currentArticleMedia.length > 0" class="w-full mb-8">
+          <div class="carousel-container relative">
+            <div v-if="currentArticleMedia.length > 1" class="touch-indicator absolute top-4 right-4 z-20 bg-white/90 px-3 py-2 rounded-full text-sm">
+              <i class="fas fa-hand-pointer mr-1"></i> Swipe to navigate
+            </div>
+
+            <div class="carousel-track">
+              <div
+                v-for="(media, index) in currentArticleMedia"
+                :key="index"
+                class="carousel-slide"
+                :class="{ active: index === currentMediaIndex }"
+              >
+                <!-- Image -->
+                <img
+                  v-if="media.type === 'image'"
+                  :src="media.path"
+                  :alt="media.alt_text || selectedArticle.title"
+                  loading="lazy"
+                  @click="openFullscreen(media.path)"
+                  class="cursor-pointer w-full h-auto object-cover rounded-xl"
+                />
+
+                <!-- Video (YouTube/Vimeo) -->
+                <div v-else-if="media.type === 'video' && media.video_type === 'url'" class="aspect-video">
+                  <iframe
+                    :src="getEmbedUrl(media.path)"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    :title="media.title || 'Video'"
+                    class="w-full h-full rounded-xl"
+                  ></iframe>
+                </div>
+
+                <!-- Local Video -->
+                <video
+                  v-else-if="media.type === 'video' && media.video_type === 'local'"
+                  controls
+                  preload="metadata"
+                  :title="media.title"
+                  class="w-full h-auto rounded-xl"
+                >
+                  <source :src="media.path" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+
+            <!-- Slide Counter -->
+            <div v-if="currentArticleMedia.length > 1" class="carousel-counter absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 px-4 py-2 rounded-full text-sm font-semibold">
+              <span>{{ currentMediaIndex + 1}}</span> / 
+              <span>{{ currentArticleMedia.length }}</span>
+            </div>
+          </div>
+
+          <!-- Navigation Controls -->
+          <div v-if="currentArticleMedia.length > 1" class="flex items-center justify-center mt-4 space-x-4">
+            <button @click="prevMedia" class="carousel-nav-btn p-3 bg-gray-100 hover:bg-gray-200 rounded-full transition">
+              <i class="fas fa-chevron-left text-gray-700"></i>
+            </button>
+
+            <div class="flex gap-2">
+              <div
+                v-for="(media, index) in currentArticleMedia"
+                :key="index"
+                class="carousel-dot w-2.5 h-2.5 rounded-full cursor-pointer transition-all"
+                :class="index === currentMediaIndex ? 'bg-blue-600 scale-110' : 'bg-gray-300'"
+                @click="goToMedia(index)"
+              ></div>
+            </div>
+
+            <button @click="nextMedia" class="carousel-nav-btn p-3 bg-gray-100 hover:bg-gray-200 rounded-full transition">
+              <i class="fas fa-chevron-right text-gray-700"></i>
+            </button>
+          </div>
+
+          <!-- Media Info -->
+          <div v-if="currentArticleMedia[currentMediaIndex]" class="mt-4 text-center">
+            <div class="text-gray-600 text-lg">
+              {{ currentArticleMedia[currentMediaIndex].description || currentArticleMedia[currentMediaIndex].alt_text || '' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Content / Descriptions -->
+        <div v-if="processedSections.length > 0" class="mb-8">
+          <div v-for="(section, index) in processedSections" :key="section.id || index" class="mb-8">
+            <div class="text-gray-800 text-lg leading-relaxed font-serif whitespace-pre-line" :class="index === 0 ? 'text-center' : 'text-left'">
+              {{ section.description }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Fallback: Show article description if no content sections -->
+        <div v-else-if="selectedArticle.description" class="mb-8">
+          <div class="text-gray-800 text-lg leading-relaxed font-serif text-center whitespace-pre-line">
+            {{ selectedArticle.description }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- News Events List View -->
+    <div v-else class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
       <!-- Hero Section -->
       <section
         class="relative bg-blue-400 h-96 flex items-center justify-center bg-cover bg-center mt-[14vh]"
@@ -41,7 +177,7 @@
           </div>
 
           <!-- Headline Article -->
-          <div class="group cursor-pointer mb-16">
+          <Link :href="`/news-events/${headlineArticle.id}`" class="group cursor-pointer mb-16 block">
             <div class="relative overflow-hidden rounded-2xl shadow-2xl">
               <img
                 :src="headlineArticle.image_path"
@@ -64,7 +200,7 @@
                 </span>
               </div>
 
-              <!-- Content overlay - positioned at bottom -->
+              <!-- Content overlay -->
               <div class="absolute bottom-0 left-0 w-full p-6 md:p-8">
                 <div class="max-w-4xl">
                   <h3 class="text-white font-bold text-2xl md:text-3xl leading-tight mb-3">
@@ -76,7 +212,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
         </div>
       </section>
 
@@ -170,7 +306,7 @@
         </div>
 
         <!-- Content Grid -->
-        <div class="content-grid">
+        <div id="content-grid">
           <!-- News Items with Batch Grouping -->
           <div v-if="activeFilter === 'news'">
             <div v-for="(group, batchNumber) in groupedNews" :key="batchNumber" class="mb-12">
@@ -196,10 +332,11 @@
 
               <!-- News Grid -->
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div
+                <Link
                   v-for="item in group.items"
                   :key="item.id"
-                  class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-[420px] hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                  :href="`/news-events/${item.id}`"
+                  class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-[420px] hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
                 >
                   <div class="relative">
                     <img :src="item.image" :alt="item.title" class="w-full h-48 object-cover" />
@@ -223,17 +360,18 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
 
           <!-- Events -->
           <div v-if="activeFilter === 'events'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div
+            <Link
               v-for="item in events"
               :key="item.id"
-              class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-[420px] hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+              :href="`/news-events/${item.id}`"
+              class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-[420px] hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
             >
               <div class="relative">
                 <img :src="item.image" :alt="item.title" class="w-full h-48 object-cover" />
@@ -257,7 +395,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
 
           <!-- Videos & Promotions -->
@@ -275,9 +413,12 @@
               </div>
             </div>
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div
+              <a
                 v-for="item in videosPromotions"
                 :key="item.id"
+                :href="item.video_url"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-[420px] hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group"
               >
                 <div class="relative">
@@ -302,13 +443,13 @@
                   </p>
                   <div class="flex-1"></div>
                   <div class="w-full mt-2">
-                    <button class="inline-flex items-center font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                    <span class="inline-flex items-center font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                       Watch Now
-                      <i class="fas fa-arrow-right ml-2"></i>
-                    </button>
+                      <i class="fas fa-external-link-alt ml-2"></i>
+                    </span>
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
 
@@ -336,11 +477,19 @@
                 <p class="text-gray-600 text-sm mb-4 leading-relaxed flex-1">
                   {{ item.description }}
                 </p>
-                <div class="w-full mt-2">
-                  <button class="inline-flex items-center font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-                    Learn More
-                    <i class="fas fa-arrow-right ml-2"></i>
-                  </button>
+                
+                <!-- Video Link if available -->
+                <div v-if="item.videos && item.videos.length > 0" class="mt-2">
+                  <a 
+                    :href="item.videos[0].video_url" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center font-semibold text-purple-600 hover:text-purple-700 transition-colors"
+                  >
+                    <i class="fas fa-play-circle mr-2"></i>
+                    Watch Video
+                    <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                  </a>
                 </div>
               </div>
             </div>
@@ -350,23 +499,42 @@
     </div>
 
     <Footer />
+
+    <!-- Fullscreen Modal -->
+    <div v-if="fullscreenImage" @click="closeFullscreen" class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+      <button @click="closeFullscreen" class="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 z-10">
+        <i class="fas fa-times"></i>
+      </button>
+      <img :src="fullscreenImage" alt="Fullscreen view" class="max-w-full max-h-full object-contain">
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
-
 import Header from '@/layouts/Header.vue';
 import Footer from '@/layouts/Footer.vue';
-import Chatbot from '@/layouts/Chatbot.vue'; 
 
-import axios from 'axios'
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-AOS.init();
+const props = defineProps({
+  headlineArticle: Object,
+  newsData: Array,
+  events: Array,
+  videosPromotions: Array,
+  plantVisits: Array,
+  selectedArticle: Object,
+  articleImages: Array,
+  articleVideos: Array,
+  articleSections: Array,
+});
 
 const activeFilter = ref('news');
+const currentMediaIndex = ref(0);
+const fullscreenImage = ref(null);
+
+// Touch swipe variables
+let touchStartX = 0;
+let touchEndX = 0;
 
 // Filter tabs configuration
 const tabs = [
@@ -376,452 +544,12 @@ const tabs = [
   { filter: 'plant', label: 'Plant Visit', icon: 'fas fa-industry' }
 ];
 
-// Headline Article (hard-coded data)
-const headlineArticle = ref({
-  id: 1,
-  title: 'CvSU Rosario Supervisors Visit Interns at JPMC',
-  description: 'JPMC is honored to welcome the supervisors of Cavite State University – Rosario Campus as they visited their students undergoing On-the-Job Training with us. This meaningful visit strengthens our partnership in developing future industry professionals.',
-  image_path: '/storage/assets/img/ojt_pictures/Plant_Visit1.jpg',
-  date: '2025-08-14'
-});
-
-// Featured Content (hard-coded data)
-const featuredContent = ref({
-  id: 49,
-  title: 'Aryne Kate Magsalang Shares Inspiring Testimony',
-  image: '/storage/assets/img/ojt_pictures/aryne.png',
-  date: '2025-07-10',
-  batch: 1
-});
-
-// Hard-coded News Data (from SQL) - Alphabetically ordered by name
-const newsData = ref([
-  // Batch 1 - 16 stories (alphabetically ordered)
-  {
-    id: 49,
-    title: 'Aryne Kate Magsalang Shares Inspiring Testimony',
-    image: '/storage/assets/img/ojt_pictures/aryne.png',
-    date: '2025-07-10',
-    batch: 1
-  },
-  {
-    id: 52,
-    title: 'Gielyn Fernandez Delivers Uplifting Testimony',
-    image: '/storage/assets/img/ojt_pictures/fernandez.png',
-    date: '2025-07-05',
-    batch: 1
-  },
-  {
-    id: 50,
-    title: 'Hanelyn Abilong Shares Empowering Testimony',
-    image: '/storage/assets/img/ojt_pictures/hanelyn.png',
-    date: '2025-07-05',
-    batch: 1
-  },
-  {
-    id: 64,
-    title: 'John Cody Aburquez Delivers Inspiring Testimony',
-    image: '/storage/assets/img/ojt_pictures/cody.png',
-    date: '2025-07-06',
-    batch: 1
-  },
-  {
-    id: 53,
-    title: 'John Joseph Albuera Inspires with His Testimony',
-    image: '/storage/assets/img/ojt_pictures/joseph.png',
-    date: '2025-07-05',
-    batch: 1
-  },
-  {
-    id: 54,
-    title: 'John Vern Shares His Motivational Testimony',
-    image: '/storage/assets/img/ojt_pictures/vern.png',
-    date: '2025-07-05',
-    batch: 1
-  },
-  {
-    id: 55,
-    title: 'Junjay Sayco Reflects on His Journey in Testimony at James Polymers',
-    image: '/storage/assets/img/ojt_pictures/junjay.png',
-    date: '2025-07-05',
-    batch: 1
-  },
-  {
-    id: 56,
-    title: 'Justine James Belluso Shares Impactful Testimony',
-    image: '/storage/assets/img/ojt_pictures/justine.png',
-    date: '2025-07-05',
-    batch: 1
-  },
-  {
-    id: 65,
-    title: 'Ken Levy Aniñon Shares Empowering Testimony',
-    image: '/storage/assets/img/ojt_pictures/ken.png',
-    date: '2025-07-06',
-    batch: 1
-  },
-  {
-    id: 57,
-    title: 'Marvin Alagos Delivers His Inspiring Testimony',
-    image: '/storage/assets/img/ojt_pictures/marvin.png',
-    date: '2025-07-08',
-    batch: 1
-  },
-  {
-    id: 63,
-    title: 'Melchor Adrian Libarnes Shares Insightful Testimony',
-    image: '/storage/assets/img/ojt_pictures/adrian.png',
-    date: '2025-07-03',
-    batch: 1
-  },
-  {
-    id: 58,
-    title: 'Phoebe Jane Mangakoy Shares Uplifting Testimony',
-    image: '/storage/assets/img/ojt_pictures/phoebe.png',
-    date: '2025-07-05',
-    batch: 1
-  },
-  {
-    id: 59,
-    title: 'Prince Pila Delivers His Heartfelt Testimony at James Polymers',
-    image: '/storage/assets/img/ojt_pictures/prince.png',
-    date: '2025-07-05',
-    batch: 1
-  },
-  {
-    id: 60,
-    title: 'Rhemnel Nimrhod Cecilio Shares Powerful Testimony',
-    image: '/storage/assets/img/ojt_pictures/rhemnel.png',
-    date: '2025-07-03',
-    batch: 1
-  },
-  {
-    id: 61,
-    title: 'Richardo Abanto Shares Motivational Testimony',
-    image: '/storage/assets/img/ojt_pictures/richardo.png',
-    date: '2025-07-03',
-    batch: 1
-  },
-  {
-    id: 62,
-    title: 'Roland Cris Jacob Inspires with Testimony at James Polymers',
-    image: '/storage/assets/img/ojt_pictures/roland.png',
-    date: '2025-07-03',
-    batch: 1
-  },
-  // Batch 2 - 10 stories (alphabetically ordered)
-  {
-    id: 69,
-    title: 'Adrian De Lara Shares His Motivational Testimony',
-    image: '/storage/assets/img/ojt_pictures/lara.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 70,
-    title: 'Aljohnson Daet Shares His Inspiring Testimony',
-    image: '/storage/assets/img/ojt_pictures/aljohnson.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 71,
-    title: 'Carlos Luis Cataulin Shares His Empowering Testimony',
-    image: '/storage/assets/img/ojt_pictures/cataulin.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 72,
-    title: 'Francis Emmanuel Abaya Delivers His Uplifting Testimony',
-    image: '/storage/assets/img/ojt_pictures/abaya.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 73,
-    title: 'Genrey Palomares Inspires with His Testimony',
-    image: '/storage/assets/img/ojt_pictures/genrey.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 74,
-    title: 'Jerico Altabano Shares His Motivational Testimony',
-    image: '/storage/assets/img/ojt_pictures/altabano.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 76,
-    title: 'John Lawrence Agustin Shares His Impactful Testimony',
-    image: '/storage/assets/img/ojt_pictures/lawrence.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 75,
-    title: 'Jonathan Fajardo Reflects on His Journey in Testimony at James Polymers',
-    image: '/storage/assets/img/ojt_pictures/fajardo.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 77,
-    title: 'Paul Vincent Olega Delivers His Inspiring Testimony',
-    image: '/storage/assets/img/ojt_pictures/olega.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 78,
-    title: 'Randy Cornita Shares His Powerful Testimony',
-    image: '/storage/assets/img/ojt_pictures/cornita.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 79,
-    title: 'Ronald Josiah Cruz Inspires with Testimony at James Polymers',
-    image: '/storage/assets/img/ojt_pictures/josiah.png',
-    date: '2025-07-19',
-    batch: 2
-  },
-  // Batch 3 - 26 stories (alphabetically ordered)
-  {
-    id: 91,
-    title: 'Arlan M. Salisipan Jr. tells his motivating experience in James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (12).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 104,
-    title: 'Arl Joseph Lagasca Rodelas offers his testimony of growth and resilience',
-    image: '/storage/assets/img/ojt_pictures/3 (25).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 82,
-    title: 'Angelica P. Ramirez reveals her uplifting story of new opportunities',
-    image: '/storage/assets/img/ojt_pictures/3 (3).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 83,
-    title: 'Cathereena Paula G. Capacia tells her motivating journey of success with James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (4).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 92,
-    title: 'Cristine S. Trubanos reveals her testimony of success at James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (13).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 93,
-    title: 'Daniel Ross B. Evia presents his uplifting story about James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (14).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 86,
-    title: 'Danzle Ian Bucoy Vale Cruz presents his uplifting story about James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (7).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 94,
-    title: 'Elisha B. Rebollos gives his heartfelt appreciation for James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (15).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 100,
-    title: 'Gerimae Vega Buen tells her heartfelt story of perseverance',
-    image: '/storage/assets/img/ojt_pictures/3 (21).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 102,
-    title: 'Hannah Jane C. Bito-on reveals her testimony of success at James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (23).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 97,
-    title: 'Harold Diaz Vivas offers his gratitude for the support of James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (18).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 106,
-    title: 'Harold Miano Dizon recounts his powerful journey of dedication',
-    image: '/storage/assets/img/ojt_pictures/3 (26).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 81,
-    title: 'Jasmin Rize H. Calicdan tells her motivating account of professional success',
-    image: '/storage/assets/img/ojt_pictures/3 (2).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 89,
-    title: 'John Benedict L. Tabor offers his uplifting story of career success',
-    image: '/storage/assets/img/ojt_pictures/3 (10).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 103,
-    title: 'Jonel Billones Andamon reveals his encouraging testimony about James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (24).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 99,
-    title: 'Julius Christian Partido Cuvos delivers his remarkable testimony of hard work',
-    image: '/storage/assets/img/ojt_pictures/3 (20).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 90,
-    title: 'Kenneth Gabren E. Oakes reveals his encouraging testimony about James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (11).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 95,
-    title: 'Kim Irvine Ulep tells his inspiring journey of resilience',
-    image: '/storage/assets/img/ojt_pictures/3 (16).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 101,
-    title: 'Larrah Jane Ashley T. Manzo delivers her inspiring testimony of dedication',
-    image: '/storage/assets/img/ojt_pictures/3 (22).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 87,
-    title: 'Marc Daniel D. Moratalla tells his inspiring journey of resilience and determination',
-    image: '/storage/assets/img/ojt_pictures/3 (8).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 84,
-    title: 'Mark Jezreel C. Antivo tells his inspiring experience with James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (5).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 88,
-    title: 'Mhira Shane O. Pato reveals her encouraging journey of determination',
-    image: '/storage/assets/img/ojt_pictures/3 (9).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 80,
-    title: 'Niña Mae M. Rubio gives her moving account of working with James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (1).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 98,
-    title: 'Rhea Mae B. Lapido reveals her testimony of success at James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (19).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 85,
-    title: 'Sebastian Lucas Tagalog presents his story of achievement and progress',
-    image: '/storage/assets/img/ojt_pictures/3 (6).png',
-    date: '2025-09-09',
-    batch: 3
-  },
-  {
-    id: 96,
-    title: 'Sherlywin V. Bongalon delivers her story of professional growth with James Polymer',
-    image: '/storage/assets/img/ojt_pictures/3 (17).png',
-    date: '2025-09-09',
-    batch: 3
-  }
-]);
-
-// Hard-coded Events Data
-const events = ref([
-  {
-    id: 66,
-    title: 'Internship Journey Highlights: Batch One Graduation & Hands-On Experience',
-    image: '/storage/assets/img/ojt_pictures/1 (13).jpg',
-    date: '2025-07-09',
-    batch: 2
-  },
-  {
-    id: 67,
-    title: 'Internship Journey Highlights: Batch Two Graduation & Hands-On Experience',
-    image: '/storage/assets/img/ojt_pictures/2 (16).webp',
-    date: '2025-07-19',
-    batch: 2
-  },
-  {
-    id: 68,
-    title: 'Internship Journey Highlights: CvSU - Rosario Visit',
-    image: '/storage/assets/img/ojt_pictures/Plant_Visit1.jpg',
-    date: '2025-08-14',
-    batch: 2
-  }
-]);
-
-// Hard-coded Videos & Promotions Data
-const videosPromotions = ref([]);
-
-// Hard-coded Plant Visits Data
-const plantVisits = ref([
-  {
-    id: 1,
-    title: 'Business Meeting and Product Discussion with U.S. Client at James Polymers',
-    description: 'James Polymers Manufacturing Corporation was honored to welcome a valued client from the United States for a focused business meeting centered around our product offerings and future partnership opportunities. The visit began with a brief introduction...',
-    image: '/storage/assets/img/plant_visit/US client.jpg',
-    created_at: '2025-07-03'
-  },
-  {
-    id: 2,
-    title: 'German Client Visit and Plant Tour',
-    description: 'We were honored to welcome our esteemed client from Germany for an official visit to James Polymers Manufacturing Corporation. The day began with a guided plant tour, where we showcased our advanced production facilities, including key stages of our...',
-    image: '/storage/assets/img/plant_visit/German client.jpg',
-    created_at: '2025-07-03'
-  }
-]);
-
 // Computed property to group news by batch
 const groupedNews = computed(() => {
+  if (!props.newsData) return {};
+  
   const groups = {};
-  newsData.value.forEach(item => {
+  props.newsData.forEach(item => {
     if (!groups[item.batch]) {
       groups[item.batch] = {
         name: `Batch ${item.batch}`,
@@ -835,21 +563,275 @@ const groupedNews = computed(() => {
 
 // All content combined
 const allContent = computed(() => {
-  return [...newsData.value, ...events.value, ...videosPromotions.value, ...plantVisits.value];
+  return [
+    ...(props.newsData || []), 
+    ...(props.events || []), 
+    ...(props.videosPromotions || []),
+    ...(props.plantVisits || [])
+  ];
 });
 
-// Date formatting function
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+// Process sections with media
+const processedSections = computed(() => {
+  if (!props.articleSections) return [];
+  
+  return props.articleSections.map(section => {
+    return {
+      ...section,
+      description: section.description || section.content || ''
+    };
   });
+});
+
+// Current article media - prioritize videos over images
+const currentArticleMedia = computed(() => {
+  if (!props.selectedArticle) return [];
+  
+  const media = [];
+  
+  // Add videos FIRST (priority)
+  if (props.articleVideos && props.articleVideos.length > 0) {
+    props.articleVideos.forEach(vid => {
+      media.push({
+        type: 'video',
+        path: vid.video_path,
+        video_type: vid.video_type,
+        title: vid.video_title,
+        description: vid.video_description
+      });
+    });
+  }
+  
+  // Add images only if no videos exist
+  if (media.length === 0 && props.articleImages) {
+    props.articleImages.forEach(img => {
+      media.push({
+        type: 'image',
+        path: img.image_path,
+        alt_text: img.alt_text
+      });
+    });
+  }
+  
+  return media;
+});
+
+// Methods
+const formatDate = (date) => {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 };
+
+const getEmbedUrl = (url) => {
+  if (!url) return '';
+  
+  // YouTube
+  if (url.includes('youtube.com/watch?v=')) {
+    const videoId = url.split('v=')[1]?.split('&')[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  } else if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  
+  // Vimeo
+  if (url.includes('vimeo.com/')) {
+    const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
+    return `https://player.vimeo.com/video/${videoId}`;
+  }
+  
+  return url;
+};
+
+const nextMedia = () => {
+  if (currentMediaIndex.value < currentArticleMedia.value.length - 1) {
+    currentMediaIndex.value++;
+  } else {
+    currentMediaIndex.value = 0;
+  }
+};
+
+const prevMedia = () => {
+  if (currentMediaIndex.value > 0) {
+    currentMediaIndex.value--;
+  } else {
+    currentMediaIndex.value = currentArticleMedia.value.length - 1;
+  }
+};
+
+const goToMedia = (index) => {
+  currentMediaIndex.value = index;
+};
+
+const openFullscreen = (imagePath) => {
+  fullscreenImage.value = imagePath;
+};
+
+const closeFullscreen = () => {
+  fullscreenImage.value = null;
+};
+
+// Touch swipe handlers
+const handleTouchStart = (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+};
+
+const handleTouchEnd = (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+};
+
+const handleSwipe = () => {
+  const swipeThreshold = 50;
+  if (touchEndX < touchStartX - swipeThreshold) {
+    nextMedia();
+  }
+  if (touchEndX > touchStartX + swipeThreshold) {
+    prevMedia();
+  }
+};
+
+// Keyboard navigation
+const handleKeydown = (e) => {
+  if (!props.selectedArticle) return;
+  
+  if (e.key === 'ArrowLeft') {
+    prevMedia();
+  } else if (e.key === 'ArrowRight') {
+    nextMedia();
+  } else if (e.key === 'Escape') {
+    if (fullscreenImage.value) {
+      closeFullscreen();
+    }
+  }
+};
+
+onMounted(() => {
+  // Add touch event listeners for carousel swipe
+  const carouselTrack = document.querySelector('.carousel-track');
+  if (carouselTrack) {
+    carouselTrack.addEventListener('touchstart', handleTouchStart, { passive: true });
+    carouselTrack.addEventListener('touchend', handleTouchEnd, { passive: true });
+  }
+  
+  // Add keyboard navigation
+  window.addEventListener('keydown', handleKeydown);
+  
+  // Scroll to top if viewing article
+  if (props.selectedArticle) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+onUnmounted(() => {
+  // Clean up event listeners
+  const carouselTrack = document.querySelector('.carousel-track');
+  if (carouselTrack) {
+    carouselTrack.removeEventListener('touchstart', handleTouchStart);
+    carouselTrack.removeEventListener('touchend', handleTouchEnd);
+  }
+  
+  window.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <style scoped>
+/* Carousel Styles */
+.carousel-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: #f3f4f6;
+}
+
+.carousel-track {
+  display: flex;
+  position: relative;
+  width: 100%;
+}
+
+.carousel-slide {
+  display: none;
+  width: 100%;
+  min-height: 400px;
+}
+
+.carousel-slide.active {
+  display: block;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 0.75rem;
+}
+
+.carousel-slide iframe,
+.carousel-slide video {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+}
+
+.aspect-video {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+}
+
+.aspect-video iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.touch-indicator {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.carousel-counter {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-nav-btn {
+  transition: all 0.3s ease;
+}
+
+.carousel-nav-btn:hover {
+  background-color: #e5e7eb !important;
+  transform: scale(1.1);
+}
+
+.carousel-dot {
+  transition: all 0.3s ease;
+}
+
+.carousel-dot:hover {
+  transform: scale(1.2);
+}
+
+/* Fullscreen Modal */
+.fixed.inset-0 {
+  cursor: zoom-out;
+}
+
+/* Animation for floating badges */
 @keyframes float {
   0%, 100% {
     transform: translateY(0px);
@@ -863,9 +845,31 @@ const formatDate = (dateString) => {
   animation: float 3s ease-in-out infinite;
 }
 
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+}
+
+/* Line clamp utility */
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .carousel-slide {
+    min-height: 300px;
+  }
+  
+  .touch-indicator {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
 }
 </style>
