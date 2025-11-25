@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\Admin\AdminUsersController; // PLEASE DONT CHANGE THIS SHIT
+use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 
-use App\Http\Controllers\NewsEventController;
+use App\Http\Controllers\NewsEventsController;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -68,17 +68,6 @@ Route::get('/', function () {
 
     $customers = \App\Models\Customer::orderBy('display_order')->get();
     
-    // Get customer section settings
-    /* $customersHeading = DB::table('home_sections')
-        ->where('section_name', 'customers')
-        ->where('field_name', 'heading')
-        ->value('value') ?? 'Our Valued Customers';
-    
-    $customersSubheading = DB::table('home_sections')
-        ->where('section_name', 'customers')
-        ->where('field_name', 'subheading')
-        ->value('value') ?? "We're proud to partner with industry leaders."; */
-    
     return Inertia::render('Website/Home', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -102,8 +91,6 @@ Route::get('/', function () {
                 'display_order' => $customer->display_order
             ];
         })->toArray(),
-        /* 'customersHeading' => $customersHeading,
-        'customersSubheading' => $customersSubheading */
     ]);
 })->name('home');
 
@@ -137,8 +124,6 @@ Route::get('/products', function () {
 })->name('products');
 
 Route::get('/about', fn() => Inertia::render('Website/About'))->name('about');
-Route::get('/industries', fn() => Inertia::render('Website/Explore/Industries'))->name('industries');
-Route::get('/awards-recognition', fn() => Inertia::render('Website/Explore/Awards'))->name('awards-recognition');
 
 // Industries page route
 Route::get('/industries', function () {
@@ -200,27 +185,15 @@ Route::get('/privacy-policy', fn() => Inertia::render('Website/More/PrivacyPolic
 Route::get('/overview-process', function () {
     return Inertia::render('Website/More/OverviewProcess');
 })->name('overview-process');
-
-// News & Events page route
-Route::get('/news-events', function () {
-    return Inertia::render('Website/More/NewsEvents');
-})->name('news-events');
+ 
+// News & Events Routes (No API - Direct Inertia Routing)
+Route::get('/news-events', [NewsEventsController::class, 'index'])->name('news-events.index');
+Route::get('/news-events/{id}', [NewsEventsController::class, 'show'])->name('news-events.show');
 
 // Careers page route
 Route::get('/careers', function () {
     return Inertia::render('Website/More/Careers');
 })->name('careers');
-
-// FAQ page route
-Route::get('/faq', function () {
-    return Inertia::render('Website/More/FAQ');
-})->name('faq');
-
-// Privacy Policy page route
-// Privacy Policy
-Route::get('/privacy-policy', function () {
-    return Inertia::render('Website/More/PrivacyPolicy');
-})->name('privacy-policy');
 
 /*
 |--------------------------------------------------------------------------
@@ -363,7 +336,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 require __DIR__.'/auth.php';
 
-
 /*
 |--------------------------------------------------------------------------
 | Admin API Routes
@@ -377,5 +349,3 @@ Route::prefix('admin/api')->name('admin.api.')->group(function () {
 
     Route::apiResource('services', AdminServiceController::class);
 });
-
-require __DIR__.'/auth.php';
