@@ -80,22 +80,25 @@
             class="faq-item"
             :style="{ animationDelay: `${index * 0.1}s` }"
           >
-            <div 
-              class="faq-question"
-              @click="toggleFaq(faq.id)"
-            >
+            <div class="faq-question" @click="toggle(index)">
+
               <div class="faq-icon">
                 <i class="fa-solid fa-question" />
               </div>
               <div class="faq-question-text">
                 <h3>{{ faq.question }}</h3>
               </div>
-              <div class="faq-chevron" :class="{ active: activeFaq === faq.id }">
-                <i class="fas fa-chevron-down" />
-              </div>
+              <div
+  class="faq-chevron"
+  :class="{ 'rotate-180': activeIndex === index }"
+>
+  <i class="fas fa-chevron-down"></i>
+</div>
+
             </div>
             <transition name="faq-expand">
-              <div v-if="activeFaq === faq.id" class="faq-answer">
+              <div class="faq-answer" v-show="activeIndex === index">
+
                 <div class="faq-answer-content">
                   <p>{{ faq.answer }}</p>
                 </div>
@@ -180,6 +183,12 @@ import { ref, computed } from 'vue'
 import Header from '@/layouts/Header.vue'
 import Footer from '@/layouts/Footer.vue'
 
+// For Q&A
+const activeIndex = ref(null);
+const toggle = (i) => {
+  activeIndex.value = activeIndex.value === i ? null : i;
+};
+
 // Props from Inertia
 const props = defineProps({
   faqs: {
@@ -197,13 +206,11 @@ const props = defineProps({
 })
 
 // Reactive state
-const activeFaq = ref(null)
+
 const searchQuery = ref('')
 
 // Toggle FAQ
-const toggleFaq = (id) => {
-  activeFaq.value = activeFaq.value === id ? null : id
-}
+
 
 // Filtered FAQs based on search
 const filteredFaqs = computed(() => {
@@ -217,6 +224,8 @@ const filteredFaqs = computed(() => {
            faq.answer.toLowerCase().includes(query)
   })
 })
+
+
 </script>
 
 <style scoped>
