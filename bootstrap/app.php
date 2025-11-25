@@ -8,6 +8,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\AdminAuth;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,27 +17,23 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
-        ]);
-
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
-
+    ->withMiddleware(function (Middleware $middleware) {
+        // Web middleware (removed duplicate)
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
-        // Register admin middleware alias
+
+        // Cookie encryption exceptions
+        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+
+        // Register middleware aliases
         $middleware->alias([
             'admin' => AdminMiddleware::class,
-        ]);
-        $middleware->alias([
-            'admin.auth' => \App\Http\Middleware\AdminAuth::class,
+            'admin.auth' => AdminAuth::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

@@ -186,7 +186,7 @@ const formatDate = (date) => {
                             <div class="flex items-start space-x-3">
                                 <img
                                     v-if="product.image"
-                                    :src="`/${product.image}`"
+                                    :src="`/storage/${product.image}`"
                                     :alt="product.name"
                                     class="w-12 h-12 rounded object-cover flex-shrink-0"
                                 />
