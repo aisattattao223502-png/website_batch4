@@ -55,7 +55,7 @@
                         </p>
                     </div>
 
-                    <!-- <div class="audio-controls">
+                    <div class="audio-controls">
                         <button 
                             @click="toggleAudio"
                             class="audio-btn"
@@ -67,7 +67,7 @@
                         <audio ref="audioPlayer" class="hidden">
                             <source :src="audioUrl" type="audio/mpeg">
                         </audio>
-                    </div> -->
+                    </div>
                 </div>
             </div>
         </section>
@@ -497,7 +497,7 @@ const remainingCerts = computed(() => props.certifications.slice(4))
 const currentBg = ref(1)
 const isPlaying = ref(false)
 const audioPlayer = ref(null)
-const audioUrl = '/storage/assets/audio/presidents-message.mp3'
+const audioUrl = '/storage/assets/audio/presidentmessage.mp3'
 
 // Audio control
 const toggleAudio = () => {

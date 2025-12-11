@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- OPTIMIZED HEADER -->
+    <!-- OPTIMIZED RESPONSIVE HEADER -->
     <header
       ref="headerRef"
       :class="[
@@ -10,58 +10,66 @@
       style="font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif"
       id="main-header"
     >
-      <div class="container mx-auto px-3 sm:px-4 py-3 flex items-center justify-between">
+      <div class="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-3 sm:py-3.5 md:py-4 flex items-center justify-between gap-2">
         <!-- LOGO + COMPANY NAME -->
-        <div class="flex items-center gap-3 flex-shrink-0">
+        <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0 max-w-[60%] sm:max-w-none">
           <img
             :src="logoPath"
             alt="James Polymers"
             :class="[
-              'rounded-full object-cover border-2 shadow-md bg-white',
-              'aspect-square w-12 sm:w-14 md:w-16 lg:w-18 xl:w-20',
-              'transition-transform duration-300 ease-in-out hover:scale-105',
-              logoBorderClass,
+              'rounded-full object-cover shadow-md bg-white',
+              'aspect-square w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 lg:w-20 lg:h-20 xl:w-22 xl:h-22',
+              'transition-transform duration-300 ease-in-out',
+              'scale-125 sm:scale-150',
+              'mt-2 sm:mt-4 mr-2 sm:mr-4',
+              'flex-shrink-0',
+              'logo-border',
             ]"
           />
 
-          <div class="flex flex-col justify-center">
-            <div class="text-sm sm:text-lg md:text-xl font-bold dynamic-text tracking-tight leading-tight">
-              <span class="font-serif dynamic-j text-xl sm:text-2xl md:text-3xl italic">J</span>AMES
-              <span class="font-serif pe-1 dynamic-p text-xl sm:text-2xl md:text-3xl italic">P</span>OLYMERS
-              
-              <!-- Animated Text Transition -->
-              <span class="block text-xs sm:text-sm md:text-base font-semibold dynamic-corp mt-0.5 leading-tight relative h-5 sm:h-6 overflow-hidden">
+          <div class="flex flex-col justify-center w-auto sm:w-64 md:w-72 lg:w-80 xl:w-96 min-w-0">
+            <div class="text-sm xs:text-base sm:text-lg md:text-xl font-bold dynamic-text tracking-tight leading-tight">
+              <!-- Animated Text Transition - EVERYTHING transitions -->
+              <span class="block relative h-14 xs:h-16 sm:h-16 md:h-20 overflow-hidden">
                 <transition name="slide-fade" mode="out-in">
+                  <!-- State 1: Full Company Name -->
                   <span 
                     v-if="showMainText" 
                     :key="'main'"
-                    class="flex items-center whitespace-nowrap"
+                    class="flex flex-col"
                   >
-                    MANUFACTURING CORP.
+                    <span class="whitespace-nowrap">
+                      <span class="font-serif dynamic-j text-2xl xs:text-3xl sm:text-3xl md:text-4xl lg:text-5xl italic">J</span>
+                      <span class="text-xs xs:text-sm sm:text-sm md:text-base lg:text-lg mr-2">AMES</span>
+                      <span class="font-serif pe-0.5 sm:pe-1 dynamic-p text-2xl xs:text-3xl sm:text-3xl md:text-4xl lg:text-5xl italic">P</span><span class="text-xs xs:text-sm sm:text-sm md:text-base lg:text-lg">OLYMERS</span>
+                    </span>
+                    <span class="text-[0.55rem] xs:text-[0.6rem] sm:text-xs md:text-sm font-semibold dynamic-corp mt-1 whitespace-nowrap">
+                      MANUFACTURING CORP.
+                    </span>
                   </span>
+
+                  <!-- State 2: Tagline -->
                   <span 
-                      v-else 
-                      :key="'tagline'"
-                      class="flex items-center whitespace-nowrap"
-                    >
-                      OUR EXPERTISE IS YOUR ADVANTAGE
+                    v-else 
+                    :key="'tagline'"
+                    class="flex flex-col tagline-font mt-3 xs:mt-4 sm:mt-4"
+                  >
+                    <span class="text-xs xs:text-sm sm:text-sm md:text-base lg:text-lg dynamic-tagline whitespace-nowrap">Our Expertise is</span>
+                    <span class="ml-4 xs:ml-6 sm:ml-8 text-xs xs:text-sm sm:text-sm md:text-base lg:text-lg dynamic-tagline whitespace-nowrap">your Advantage</span>
                   </span>
-
-
                 </transition>
               </span>
             </div>
           </div>
         </div>
 
-        <!-- NAVIGATION -->
-        <nav class="hidden lg:flex items-center ml-4">
-
-          <ul class="flex flex-nowrap space-x-6 items-center">
+        <!-- DESKTOP NAVIGATION -->
+        <nav class="hidden lg:flex items-center ml-2 xl:ml-4 flex-shrink-0">
+          <ul class="flex flex-nowrap space-x-3 xl:space-x-6 items-center">
             <li>
               <Link
                 href="/"
-                class="menu-link font-semibold uppercase text-sm transition-colors dynamic-nav-link hover:text-blue-400"
+                class="menu-link font-semibold uppercase text-xs xl:text-sm transition-colors dynamic-nav-link hover:text-blue-400 whitespace-nowrap"
               >
                 Home
               </Link>
@@ -69,7 +77,7 @@
             <li>
               <Link
                 href="/about"
-                class="menu-link font-semibold uppercase text-sm transition-colors dynamic-nav-link hover:text-blue-400"
+                class="menu-link font-semibold uppercase text-xs xl:text-sm transition-colors dynamic-nav-link hover:text-blue-400 whitespace-nowrap"
               >
                 About
               </Link>
@@ -79,11 +87,11 @@
             <li class="dropdown relative" @mouseenter="toggleDropdown('explore', true)" @mouseleave="toggleDropdown('explore', false)">
               <a
                 href="#"
-                class="explore-dropdown font-semibold uppercase text-sm flex items-center transition-colors dynamic-nav-link hover:text-blue-400"
+                class="explore-dropdown font-semibold uppercase text-xs xl:text-sm flex items-center transition-colors dynamic-nav-link hover:text-blue-400 whitespace-nowrap"
                 @click.prevent
               >
                 Explore
-                <i :class="['fas fa-chevron-down ml-1 text-xs transition-transform duration-300 dynamic-dropdown-arrow', { 'rotate-180': dropdowns.explore }]"></i>
+                <i :class="['fas fa-chevron-down ml-1 text-[0.6rem] xl:text-xs transition-transform duration-300 dynamic-dropdown-arrow', { 'rotate-180': dropdowns.explore }]"></i>
               </a>
               <ul
                 v-show="dropdowns.explore"
@@ -109,7 +117,7 @@
             <li>
               <Link
                 href="/contact"
-                class="menu-link font-semibold uppercase text-sm transition-colors dynamic-nav-link hover:text-blue-400"
+                class="menu-link font-semibold uppercase text-xs xl:text-sm transition-colors dynamic-nav-link hover:text-blue-400 whitespace-nowrap"
               >
                 Contact
               </Link>
@@ -119,43 +127,43 @@
             <li class="dropdown relative" @mouseenter="toggleDropdown('more', true)" @mouseleave="toggleDropdown('more', false)">
               <a
                 href="#"
-                class="menu-link font-semibold uppercase text-sm flex items-center transition-colors dynamic-nav-link hover:text-blue-400"
+                class="menu-link font-semibold uppercase text-xs xl:text-sm flex items-center transition-colors dynamic-nav-link hover:text-blue-400 whitespace-nowrap"
                 @click.prevent
               >
                 More
-                <i :class="['fas fa-chevron-down ml-1 text-xs transition-transform duration-300 dynamic-dropdown-arrow', { 'rotate-180': dropdowns.more }]"></i>
+                <i :class="['fas fa-chevron-down ml-1 text-[0.6rem] xl:text-xs transition-transform duration-300 dynamic-dropdown-arrow', { 'rotate-180': dropdowns.more }]"></i>
               </a>
               <ul
                 v-show="dropdowns.more"
                 class="dropdown-menu absolute right-0 top-full w-56 bg-white shadow-lg rounded-md py-2 z-[99999] border border-gray-200"
               >
                 <li>
-                  <Link href="/sustainability" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/sustainability" @click="closeDropdowns" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     Sustainability
                   </Link>
                 </li>
                 <li>
-                  <Link href="/overview-process" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/overview-process" @click="closeDropdowns" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     Overview Process
                   </Link>
                 </li>
                 <li>
-                  <Link href="/news-events" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/news-events" @click="closeDropdowns" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     News & Events
                   </Link>
                 </li>
                 <li>
-                  <Link href="/careers" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/careers" @click="closeDropdowns" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     Careers
                   </Link>
                 </li>
                 <li>
-                  <Link href="/faq" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/faq" @click="closeDropdowns" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     FAQ
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy-policy" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
+                  <Link href="/privacy-policy" @click="closeDropdowns" class="block px-4 py-2 text-gray-800 hover:bg-blue-50 text-sm transition-colors">
                     Privacy Policy
                   </Link>
                 </li>
@@ -167,9 +175,9 @@
         <!-- MOBILE MENU BUTTON WITH HAMBURGER ANIMATION -->
         <button
           @click="toggleMobileMenu"
-          class="lg:hidden dynamic-menu-button p-2 rounded-lg hover:bg-black/10 transition-colors"
+          class="lg:hidden dynamic-menu-button p-2.5 rounded-lg hover:bg-black/10 transition-colors flex-shrink-0"
         >
-          <div class="hamburger-icon">
+          <div class="hamburger-icon w-7 h-6">
             <span :class="['hamburger-line', { 'active': mobileMenuOpen }]"></span>
             <span :class="['hamburger-line', { 'active': mobileMenuOpen }]"></span>
             <span :class="['hamburger-line', { 'active': mobileMenuOpen }]"></span>
@@ -309,7 +317,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 
 // Props
 const props = defineProps({
@@ -345,10 +353,6 @@ const headerClasses = computed(() => {
   return 'header-light header-bg-light';
 });
 
-const logoBorderClass = computed(() => {
-  return isDarkMode.value ? 'dynamic-logo-border border-blue-500' : 'dynamic-logo-border border-blue-600';
-});
-
 // Methods
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value;
@@ -376,7 +380,7 @@ const closeDropdowns = () => {
 const startTextTransition = () => {
   textTransitionInterval = setInterval(() => {
     showMainText.value = !showMainText.value;
-  }, 3000); // change every 3 seconds
+  }, 3000);
 };
 
 const stopTextTransition = () => {
@@ -462,11 +466,8 @@ onMounted(() => {
   updateHeaderAppearance();
   window.addEventListener('scroll', updateHeaderAppearance, { passive: true });
   window.addEventListener('resize', updateHeaderAppearance, { passive: true });
-
-  // Start text transition animation
   startTextTransition();
 
-  // Make sure header is always visible
   if (headerRef.value) {
     headerRef.value.style.visibility = 'visible';
     headerRef.value.style.opacity = '1';
@@ -483,18 +484,29 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Ensure header stays on top and visible */
+/* FONT */
+@font-face {
+  font-family: 'WorldDiscovery';
+  src: url('/storage/assets/fonts/world_discovery/WorldDiscovery_PERSONAL_USE_ONLY.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Header Foundation */
 header {
   z-index: 9999 !important;
   transform: translate3d(0, 0, 0) !important;
   will-change: transform;
 }
 
-/* Text Transition Animation */
-.slide-fade-enter-active {
-  transition: all 0.6s ease;
+/* Logo Border - Blue */
+.logo-border {
+  border: 3px solid #2563eb;
+  padding: 2px;
 }
 
+/* Text Transition Animation */
+.slide-fade-enter-active,
 .slide-fade-leave-active {
   transition: all 0.6s ease;
 }
@@ -509,13 +521,33 @@ header {
   opacity: 0;
 }
 
-/* Hamburger Icon Animation */
+/* Mobile Menu Transition */
+.mobile-menu-enter-active,
+.mobile-menu-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.mobile-menu-enter-from,
+.mobile-menu-leave-to {
+  opacity: 0;
+}
+
+/* Mobile Menu Transition */
+.mobile-menu-enter-active,
+.mobile-menu-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.mobile-menu-enter-from,
+.mobile-menu-leave-to {
+  opacity: 0;
+}
+
+/* Hamburger Icon */
 .hamburger-icon {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 24px;
-  height: 18px;
   cursor: pointer;
 }
 
@@ -527,9 +559,8 @@ header {
   border-radius: 2px;
 }
 
-/* Transform to X when active */
 .hamburger-line:nth-child(1).active {
-  transform: translateY(7.5px) rotate(45deg);
+  transform: translateY(9px) rotate(45deg);
 }
 
 .hamburger-line:nth-child(2).active {
@@ -537,10 +568,10 @@ header {
 }
 
 .hamburger-line:nth-child(3).active {
-  transform: translateY(-7.5px) rotate(-45deg);
+  transform: translateY(-9px) rotate(-45deg);
 }
 
-/* Dropdown hover effects */
+/* Dropdown Effects */
 .dropdown:hover .dropdown-menu {
   display: block !important;
 }
@@ -549,57 +580,55 @@ header {
   transform: rotate(180deg);
 }
 
-/* Light theme (default for most pages) */
+/* Theme Colors - Light */
 :deep(.header-light .dynamic-text),
 :deep(.header-light .dynamic-nav-link),
 :deep(.header-light .dynamic-menu-button),
-:deep(.header-light .dynamic-menu-icon),
 :deep(.header-light .dynamic-dropdown-arrow) {
-  color: #1f2937 !important; /* gray-800 */
+  color: #1f2937 !important;
 }
 
 :deep(.header-light .dynamic-j) {
-  color: #2563eb !important; /* blue-600 */
+  color: #2563eb !important;
 }
 
 :deep(.header-light .dynamic-p) {
-  color: #dc2626 !important; /* red-600 */
+  color: #dc2626 !important;
 }
 
 :deep(.header-light .dynamic-corp) {
   color: #4b5563 !important; /* gray-600 */
 }
 
-:deep(.header-light .dynamic-logo-border) {
-  border-color: #2563eb !important; /* blue-600 */
+:deep(.header-light .dynamic-tagline) {
+  color: #4b5563 !important; /* gray-600 */
 }
 
-/* Dark theme (for hero sections or dark backgrounds) */
+/* Theme Colors - Dark */
 :deep(.header-dark .dynamic-text),
 :deep(.header-dark .dynamic-nav-link),
 :deep(.header-dark .dynamic-menu-button),
-:deep(.header-dark .dynamic-menu-icon),
 :deep(.header-dark .dynamic-dropdown-arrow) {
   color: white !important;
 }
 
 :deep(.header-dark .dynamic-j) {
-  color: #93c5fd !important; /* blue-300 */
+  color: #93c5fd !important;
 }
 
 :deep(.header-dark .dynamic-p) {
-  color: #fca5a5 !important; /* red-300 */
+  color: #fca5a5 !important;
 }
 
 :deep(.header-dark .dynamic-corp) {
   color: #bfdbfe !important; /* blue-200 */
 }
 
-:deep(.header-dark .dynamic-logo-border) {
-  border-color: #3b82f6 !important; /* blue-500 */
+:deep(.header-dark .dynamic-tagline) {
+  color: #bfdbfe !important; /* blue-200 */
 }
 
-/* Header background states */
+/* Header Backgrounds */
 .header-bg-light {
   background-color: white !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
@@ -611,60 +640,142 @@ header {
   backdrop-filter: blur(8px) !important;
 }
 
-/* Smooth transitions */
+/* Smooth Transitions */
 .dynamic-header,
 :deep(.dynamic-text),
 :deep(.dynamic-nav-link),
 :deep(.dynamic-menu-button),
-:deep(.dynamic-menu-icon),
 :deep(.dynamic-dropdown-arrow),
 :deep(.dynamic-j),
 :deep(.dynamic-p),
-:deep(.dynamic-corp),
-:deep(.dynamic-logo-border) {
+:deep(.dynamic-corp) {
   transition: all 0.3s ease-in-out !important;
 }
 
+:deep(.dynamic-tagline) {
+  transition: all 0.3s ease-in-out !important;
+}
+
+/* Typography */
 .font-serif {
   font-family: 'Times New Roman', serif;
 }
 
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.95);
+.tagline-font {
+  font-family: 'WorldDiscovery', 'Inter', Arial, sans-serif !important;
+  font-weight: 400;
+  letter-spacing: 0.10em;
+  line-height: 1.2;
+}
+
+/* Responsive Adjustments */
+
+/* Extra Small devices (iPhone SE, Galaxy S8+, small phones: 320px - 374px) */
+@media (max-width: 374px) {
+  header .container {
+    padding: 0.75rem 0.75rem !important;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+  
+  .dynamic-text {
+    font-size: 0.75rem !important;
+  }
+  
+  .dynamic-j,
+  .dynamic-p {
+    font-size: 1.5rem !important;
+  }
+  
+  .dynamic-corp {
+    font-size: 0.5rem !important;
+  }
+  
+  .tagline-font span {
+    font-size: 0.75rem !important;
+  }
+  
+  .tagline-font span:last-child {
+    margin-left: 1rem !important;
+  }
+  
+  .hamburger-icon {
+    width: 24px !important;
+    height: 20px !important;
+  }
+  
+  .hamburger-line {
+    height: 2.5px !important;
+  }
+  
+  .hamburger-line:nth-child(1).active {
+    transform: translateY(8.5px) rotate(45deg) !important;
+  }
+  
+  .hamburger-line:nth-child(3).active {
+    transform: translateY(-8.5px) rotate(-45deg) !important;
   }
 }
 
-/* ===========================================
-   RESPONSIVE ADJUSTMENTS (Mobile First)
-   =========================================== */
+/* Small devices (phones: 375px - 639px) */
+@media (min-width: 375px) and (max-width: 639px) {
+  header .container {
+    padding: 0.75rem 1rem !important;
+  }
+  
+  .dynamic-text {
+    font-size: 0.875rem !important;
+  }
+  
+  .dynamic-j,
+  .dynamic-p {
+    font-size: 1.75rem !important;
+  }
+  
+  .dynamic-corp {
+    font-size: 0.55rem !important;
+  }
+  
+  .tagline-font span {
+    font-size: 0.875rem !important;
+  }
+}
 
-/* Default: Mobile-first (base styles already apply) */
-
-/* sm: ≥640px — small tablets */
+/* sm: ≥640px — small tablets and large phones */
 @media (min-width: 640px) {
   header .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 0.875rem 1rem;
   }
 
-  header img {
-    width: 3.5rem; /* 56px */
+  .tagline-font {
+    margin-top: 0.75rem;
   }
+  
+  .tagline-font span {
+    font-size: 0.875rem !important;
+  }
+}
 
-  header .dynamic-text {
-    font-size: 1rem;
+/* iPad Mini, iPad Air portrait (768px - 820px) */
+@media (min-width: 768px) and (max-width: 820px) {
+  header nav ul {
+    gap: 0.5rem !important;
+  }
+  
+  header nav {
+    margin-left: 0.5rem !important;
+  }
+  
+  .menu-link,
+  .explore-dropdown {
+    font-size: 0.65rem !important;
+  }
+  
+  .fa-chevron-down {
+    font-size: 0.5rem !important;
   }
 }
 
 /* md: ≥768px — tablets / small laptops */
 @media (min-width: 768px) {
-  /* Show desktop nav, hide mobile menu button */
   header nav {
     display: flex !important;
   }
@@ -673,69 +784,68 @@ header {
     display: none !important;
   }
 
-  /* Adjust logo sizing */
-  header img {
-    width: 4rem; /* 64px */
-  }
-
-  /* Adjust spacing and typography */
-  header .dynamic-text {
-    font-size: 1.125rem;
-  }
-
-  header .dynamic-corp {
-    font-size: 0.875rem;
-  }
-
-  /* Make dropdown menus align better */
   .dropdown-menu {
     min-width: 12rem;
+  }
+  
+  .tagline-font {
+    margin-top: 0.75rem;
+  }
+  
+  .tagline-font span {
+    font-size: 1rem !important;
+  }
+  
+  header .container {
+    padding: 1rem 1.5rem;
+  }
+}
+
+/* iPad Air landscape and similar (821px - 1023px) */
+@media (min-width: 821px) and (max-width: 1023px) {
+  header nav ul {
+    gap: 0.75rem !important;
+  }
+  
+  .menu-link,
+  .explore-dropdown {
+    font-size: 0.7rem !important;
   }
 }
 
 /* lg: ≥1024px — desktops */
 @media (min-width: 1024px) {
   header .container {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
-  header img {
-    width: 4.5rem; /* 72px */
-  }
-
-  header .dynamic-text {
-    font-size: 1.25rem;
-  }
-
-  header .dynamic-corp {
-    font-size: 1rem;
-  }
-
-  /* Slightly increase gap in nav links */
   header nav ul {
-    gap: 1.75rem;
+    gap: 1rem;
+  }
+  
+  .tagline-font {
+    margin-top: 0.75rem;
+  }
+  
+  .tagline-font span {
+    font-size: 1.125rem !important;
   }
 }
 
 /* xl: ≥1280px — large desktops */
 @media (min-width: 1280px) {
-  header img {
-    width: 5rem; /* 80px */
-  }
-
-  header .dynamic-text {
-    font-size: 1.5rem;
-  }
-
-  header .dynamic-corp {
-    font-size: 1.125rem;
-  }
-
-  /* Restore your original large layout spacing */
   header .container {
-    padding-left: 3rem;
-    padding-right: 3rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  header nav ul {
+    gap: 1.5rem;
+  }
+  
+  .tagline-font span {
+    font-size: 1.125rem !important;
   }
 }
 
@@ -743,14 +853,29 @@ header {
 @media (min-width: 1536px) {
   header .container {
     max-width: 1440px;
+    padding-left: 3rem;
+    padding-right: 3rem;
   }
 
   header nav ul {
     gap: 2.25rem;
   }
-
-  header img {
-    width: 5.5rem; /* 88px */
+  
+  .tagline-font span {
+    font-size: 1.25rem !important;
   }
 }
+
+.menu-link,
+.explore-dropdown {
+  font-size: 0.9rem;    /* adjust to your liking */
+}
+
+@media (min-width: 1280px) {
+  .menu-link,
+  .explore-dropdown {
+    font-size: 1rem;
+  }
+}
+
 </style>

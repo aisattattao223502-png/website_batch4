@@ -1,22 +1,8 @@
-
-
-
 <template>
-  <div v-if="isLoading" class="loading-overlay">
-  <orbit-spinner
-    :animation-duration="1200"
-    :size="80"
-    color="#ff1d5e"
-  />
-</div>
     <div>
         <Header />
     </div>
-    <!-- GLOBAL LOADER -->
-
-
     <Chatbot />
-
 
   <div class="homepage bg-gray-50 overflow-x-hidden">
     <!-- Modern Hero Section with Integrated Header -->
@@ -33,7 +19,7 @@
           playsinline 
           class="w-full h-full object-cover"
         >
-          <source src="storage/assets/video/heroCard.mp4" type="video/mp4">
+          <source src="storage/assets/video/1202(1).mp4" type="video/mp4">
         </video>
         <div class="absolute inset-0 bg-black/40"></div>
       </div>
@@ -48,7 +34,7 @@
       <div class="container mx-auto px-4 relative z-10">
         <div class="max-w-6xl mx-auto">
           <!-- Modern Hero Card -->
-          <div class="bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+          <div class="bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/10 mt-10">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
               <!-- Left Content Column -->
               <div class="p-8 sm:p-10 lg:p-12 flex flex-col justify-center">
@@ -127,19 +113,136 @@
                 </div>
               </div>
               
-              <!-- Right Visual Column -->
+              <!-- Right Visual Column - ENHANCED CERTIFICATION CAROUSEL -->
               <div class="p-6 lg:p-8 flex items-center justify-center bg-gradient-to-br from-slate-800/30 to-blue-900/30 relative overflow-hidden">
-                <div class="relative w-full max-w-md">
-                  <div class="relative z-10 bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 shadow-2xl">
-                    <img src="/storage/assets/img/certifications/cert.png" alt="45 Years of Excellence" class="w-full h-auto rounded-xl shadow-lg">
+                <div class="relative w-full max-w-md" style="perspective: 1000px;">
+                  <!-- 3D Flip Animation Container -->
+                  <div class="relative h-[500px]">
+                    <!-- 45 Years Image - Always Visible (Index 0) -->
+                    <div
+                      class="absolute inset-0 transition-all duration-700 ease-in-out"
+                      :class="{
+                        'opacity-100 scale-100 cert-rotate-y-0': currentCert === 0 && animationState === 'enter',
+                        'opacity-0 scale-95 cert-rotate-y-90': currentCert === 0 && animationState === 'exit',
+                        'opacity-0 scale-75 cert-rotate-y-neg-90': currentCert > 0,
+                      }"
+                      style="transform-style: preserve-3d; backface-visibility: hidden;"
+                    >
+                      <div class="relative h-full flex items-center justify-center p-6">
+                        <div class="relative group">
+                          <div class="relative z-10 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-2xl transition-all duration-500 hover:scale-105" style="transform-style: preserve-3d;">
+                            <div class="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-yellow-500/20 rounded-2xl blur-xl"></div>
+                            <img 
+                              src="/storage/assets/img/certifications/45yrs.png" 
+                              alt="45 Years of Excellence" 
+                              class="w-full h-auto rounded-xl shadow-lg relative z-10"
+                            >
+                            
+                            <!-- Glowing border effect -->
+                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500"></div>
+                          </div>
+                          
+                          <!-- Animated decorative elements -->
+                          <div class="absolute -bottom-4 -right-4 w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl rotate-12 shadow-lg flex items-center justify-center cert-bounce">
+                            <i class="fas fa-trophy text-white text-lg"></i>
+                          </div>
+                          <div class="absolute -top-4 -left-4 w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg -rotate-12 shadow-lg flex items-center justify-center animate-pulse">
+                            <i class="fas fa-star text-white text-xs cert-spin"></i>
+                          </div>
+                          
+                          <!-- Floating particles -->
+                          <div class="absolute top-1/4 right-8 w-2 h-2 bg-yellow-400 rounded-full cert-float"></div>
+                          <div class="absolute bottom-1/3 left-8 w-3 h-3 bg-amber-400 rounded-full cert-float-delayed"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Certification Cards (Index 1-8) -->
+                    <div
+                      v-for="(cert, index) in certifications"
+                      :key="index"
+                      class="absolute inset-0 transition-all duration-700 ease-in-out"
+                      :class="{
+                        'opacity-100 scale-100 cert-rotate-y-0': index + 1 === currentCert && animationState === 'enter',
+                        'opacity-0 scale-95 cert-rotate-y-90': index + 1 === currentCert && animationState === 'exit',
+                        'opacity-0 scale-75 cert-rotate-y-neg-90': index + 1 < currentCert,
+                        'opacity-0 scale-75 cert-rotate-y-90': index + 1 > currentCert
+                      }"
+                      style="transform-style: preserve-3d; backface-visibility: hidden;"
+                    >
+                      <!-- Certification card with depth -->
+                      <div class="relative h-full p-8 flex flex-col items-center justify-center">
+                        <!-- Icon burst effect -->
+                        <div class="absolute top-4 right-4 z-20">
+                          <div 
+                            class="transform transition-all duration-700"
+                            :class="index + 1 === currentCert && animationState === 'enter' ? 'scale-100 rotate-0 opacity-100' : 'scale-0 rotate-180 opacity-0'"
+                          >
+                            <div class="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full p-3 shadow-lg">
+                              <i class="fas text-white" :class="cert.icon"></i>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Background pattern -->
+                        <div class="absolute inset-0 opacity-5">
+                          <div class="absolute inset-0 cert-pattern"></div>
+                        </div>
+                        
+                        <!-- Certificate image with 3D lift effect -->
+                        <div 
+                          class="relative transform transition-all duration-700"
+                          :class="index + 1 === currentCert && animationState === 'enter' ? 'translate-y-0' : 'translate-y-4'"
+                        >
+                          <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-lg blur-2xl transform translate-y-4"></div>
+                          <img
+                            :src="cert.image"
+                            :alt="cert.title"
+                            class="relative w-full h-auto max-h-96 object-contain rounded-lg shadow-2xl"
+                          >
+                        </div>
+
+                        <!-- Floating icon decoration -->
+                        <div 
+                          class="absolute top-8 left-8 transform transition-all duration-1000"
+                          :class="index + 1 === currentCert && animationState === 'enter' ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'"
+                        >
+                          <div class="bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full p-4 shadow-lg cert-bounce">
+                            <i class="fas text-white text-2xl" :class="cert.icon"></i>
+                          </div>
+                        </div>
+
+                        <!-- Animated Title Banner -->
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 via-gray-900/95 to-transparent p-6 backdrop-blur-sm">
+                          <div 
+                            class="transform transition-all duration-700"
+                            :class="index + 1 === currentCert && animationState === 'enter' ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'"
+                          >
+                            <h4 class="text-white text-xl font-bold text-center">
+                              {{ cert.title }}
+                            </h4>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <!-- Decorative elements -->
-                  <div class="absolute -bottom-4 -right-4 w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-xl rotate-12 shadow-lg flex items-center justify-center">
-                    <i class="fas fa-trophy text-white text-lg"></i>
-                  </div>
-                  <div class="absolute -top-4 -left-4 w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg -rotate-12 shadow-lg flex items-center justify-center">
-                    <i class="fas fa-star text-white text-xs"></i>
+
+                  <!-- Interactive Dots Indicator (9 total: 1 for 45 years + 8 certs) -->
+                  <div class="flex justify-center mt-6 gap-2">
+                    <button
+                      @click="goToCert(0)"
+                      class="transition-all duration-300 rounded-full"
+                      :class="currentCert === 0 ? 'w-8 h-3 bg-amber-400' : 'w-3 h-3 bg-white/30 hover:bg-white/50'"
+                      aria-label="45 Years Celebration"
+                    />
+                    <button
+                      v-for="(cert, index) in certifications"
+                      :key="index"
+                      @click="goToCert(index + 1)"
+                      class="transition-all duration-300 rounded-full"
+                      :class="currentCert === index + 1 ? 'w-8 h-3 bg-cyan-400' : 'w-3 h-3 bg-white/30 hover:bg-white/50'"
+                      :aria-label="`Certificate ${index + 1}`"
+                    />
                   </div>
                 </div>
               </div>
@@ -323,20 +426,21 @@
 
     <!-- Statistics Section -->
     <section class="py-16 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        <!-- Years of Expertise -->
-        <div>
-          <div class="text-5xl font-black text-blue-600">45</div>
-          <div class="mt-2 text-2xl font-semibold text-gray-700">
-            Years of Expertise
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div>
+            <div class="text-5xl font-black text-blue-600">45</div>
+            <div class="mt-2 text-2xl font-semibold text-gray-700">
+              Years of Expertise
+            </div>
           </div>
-        </div>
-
-        <!-- Number of Visitors (Dynamic) -->
-        <div>
-          <div class="text-5xl font-black text-blue-600">
-            {{ visitorCount.toLocaleString() }}
+          <div>
+            <div class="text-5xl font-black text-blue-600">
+              {{ visitorCount.toLocaleString() }}
+            </div>
+            <div class="mt-2 text-2xl font-semibold text-gray-700">
+              Number of Visitors
+            </div>
           </div>
           <div class="mt-2 text-2xl font-semibold text-gray-700">
             Total Number of Visitors
@@ -351,8 +455,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
   </div>
   <div>
     <Footer />
@@ -402,10 +505,9 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useHead } from '@vueuse/head'; // for Search Engine Optimization (SEO)
-import { OrbitSpinner } from "epic-spinners"; // Loading Spinner
+import { useHead } from '@vueuse/head';
+import { OrbitSpinner } from "epic-spinners";
 import { router } from "@inertiajs/vue3";
-
 
 import Header from '@/layouts/Header.vue';
 import Footer from '@/layouts/Footer.vue';
@@ -453,17 +555,15 @@ onUnmounted(() => {
 
 const isLoading = ref(false);
 
-// Inertia starts loading
 router.on("start", () => {
   isLoading.value = true;
 });
 
-// Inertia finishes loading
 router.on("finish", () => {
   isLoading.value = false;
 });
 
-// ADD SEO META TAGS
+// SEO META TAGS
 useHead({
   title: 'James Polymers Manufacturing Corporation - Leading Polymer Solutions Provider',
   meta: [
@@ -475,7 +575,6 @@ useHead({
       name: 'keywords',
       content: 'polymer compounds, thermoplastic materials, engineering plastics, molded rubber, master batch resin, polymer manufacturing, Philippines, ISO certified, James Polymers, TPE compounds, industrial polymers'
     },
-    // Open Graph / Facebook
     {
       property: 'og:type',
       content: 'website'
@@ -494,9 +593,8 @@ useHead({
     },
     {
       property: 'og:url',
-      content: 'https://jamespolymers.com' // domain link
+      content: 'https://jamespolymers.com'
     },
-    // Twitter
     {
       name: 'twitter:card',
       content: 'summary_large_image'
@@ -513,7 +611,6 @@ useHead({
       name: 'twitter:image',
       content: '/storage/assets/img/certifications/cert.png'
     },
-    // Additional SEO
     {
       name: 'author',
       content: 'James Polymers Manufacturing Corporation'
@@ -530,7 +627,7 @@ useHead({
   link: [
     {
       rel: 'canonical',
-      href: 'https://jamespolymers.com' // Domain URL
+      href: 'https://jamespolymers.com'
     }
   ],
   script: [
@@ -541,21 +638,21 @@ useHead({
         "@type": "Organization",
         "name": "James Polymers Manufacturing Corporation",
         "description": "Leading manufacturer of high-performance polymer compounds",
-        "url": "https://jamespolymers.com", // Domain URL
+        "url": "https://jamespolymers.com",
         "logo": "/storage/assets/img/logo-whitebg.png",
         "foundingDate": "1978",
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": "016 Panapaan II, Bacoor City, Cavite", 
+          "streetAddress": "016 Panapaan II, Bacoor City, Cavite",
           "addressLocality": "Bacoor City",
           "addressRegion": "Cavite",
-          "postalCode": "4102", 
+          "postalCode": "4102",
           "addressCountry": "PH"
         },
         "contactPoint": {
           "@type": "ContactPoint",
           "contactType": "Customer Service",
-          "telephone": "+63-2-852989785", 
+          "telephone": "+63-2-852989785",
           "email": "jamespolymers.international@gmail.com",
           "availableLanguage": ["en", "fil"]
         },
@@ -573,7 +670,6 @@ const subheading = ref(
   "We're proud to partner with industry leaders across various sectors, providing them with high-performance polymer solutions."
 );
 
-// Add this to your Home.vue script setup section
 const props = defineProps({
   products: {
     type: Array,
@@ -584,6 +680,7 @@ const props = defineProps({
     default: () => []
   }
 });
+
 const layout = ref([
   [ 1],
   [2, 3, null],
@@ -591,6 +688,53 @@ const layout = ref([
   [ 7, 8, 9, 10, null],
   [11, 12, 13, 14, 15],
 ]);
+
+// CERTIFICATION CAROUSEL DATA
+const currentCert = ref(0);
+const isAutoPlaying = ref(true);
+const animationState = ref('enter');
+
+const certifications = [
+  { title: 'ISO 9001:2015', image: '/storage/assets/img/certifications/iso-9001.png', icon: 'fa-shield-alt' },
+  { title: 'ISO 14001:2015', image: '/storage/assets/img/certifications/iso-14001.png', icon: 'fa-award' },
+  { title: 'Environmental Management Award', image: '/storage/assets/img/certifications/BEST.png', icon: 'fa-trophy' },
+  { title: 'Certified Manufacturing Practice', image: '/storage/assets/img/certifications/cGMP.png', icon: 'fa-medal' },
+  { title: 'Compliance Certification', image: '/storage/assets/img/certifications/REACH.png', icon: 'fa-trophy' },
+  { title: 'Directive Compliance', image: '/storage/assets/img/certifications/RoHS.png', icon: 'fa-shield-alt' },
+  { title: 'Certification', image: '/storage/assets/img/certifications/TQCSI 14001.png', icon: 'fa-hard-hat' },
+  { title: 'Certification', image: '/storage/assets/img/certifications/TQCSI-9001.png', icon: 'fa-award' },
+];
+
+let certInterval = null;
+
+const startAutoPlay = () => {
+  certInterval = setInterval(() => {
+    animationState.value = 'exit';
+    setTimeout(() => {
+      // Total of 9 slides: 0 (45 years) + 1-8 (certifications)
+      currentCert.value = (currentCert.value + 1) % (certifications.length + 1);
+      animationState.value = 'enter';
+    }, 600);
+  }, 5000);
+};
+
+const stopAutoPlay = () => {
+  if (certInterval) {
+    clearInterval(certInterval);
+    certInterval = null;
+  }
+};
+
+const changeCert = (newIndex) => {
+  animationState.value = 'exit';
+  setTimeout(() => {
+    currentCert.value = newIndex;
+    animationState.value = 'enter';
+  }, 600);
+  stopAutoPlay();
+};
+
+const goToCert = (index) => changeCert(index);
 
 // Customer logos array
 const allCustomerLogos = [
@@ -614,7 +758,6 @@ const currentSlide = ref(0);
 const cardWidth = ref(400); // Increased width for bigger logos
 const visibleCards = ref(3); // Changed to 3 visible cards at once
 
-// Computed properties
 const slideWidth = computed(() => cardWidth.value);
 const maxSlide = computed(() => Math.max(0, allCustomerLogos.length - visibleCards.value));
 const progress = computed(() => {
@@ -622,7 +765,6 @@ const progress = computed(() => {
   return ((currentSlide.value / maxSlide.value) * 100);
 });
 
-// Navigation functions
 const nextSlide = () => {
   if (currentSlide.value < maxSlide.value) {
     currentSlide.value++;
@@ -635,7 +777,6 @@ const prevSlide = () => {
   }
 };
 
-// Handle responsive card visibility
 const updateVisibleCards = () => {
   const width = window.innerWidth;
   if (width < 640) {
@@ -648,7 +789,6 @@ const updateVisibleCards = () => {
     visibleCards.value = 3;
     cardWidth.value = 400;
   }
-  // Reset to first slide if current position is invalid
   if (currentSlide.value > maxSlide.value) {
     currentSlide.value = maxSlide.value;
   }
@@ -674,69 +814,64 @@ const incrementVisitorCount = async () => {
   }
 }
 
-/* -------------------------
-   Lifecycle: mount AOS + fetch data
-   ------------------------- */
 let aosRefreshHandler = null;
 
 onMounted(async () => {
-  // increment & fetch visitors (your existing behavior)
   await incrementVisitorCount()
   await fetchVisitorCount()
 
-  // init AOS (ensure AOS and its css are imported)
   AOS.init({
     duration: 800,
     once: true,
-    // easing: 'ease-out-cubic' // optional
   });
 
   AOS.refresh();
 
-  // Also call refresh on window load in case media/images change layout after initial mount
   aosRefreshHandler = () => AOS.refresh();
   window.addEventListener('load', aosRefreshHandler);
 
-  // Add carousel resize handler
   updateVisibleCards();
   window.addEventListener('resize', updateVisibleCards);
+  
+  // Start certification carousel auto-play
+  startAutoPlay();
 });
-
 
 onUnmounted(() => {
   if (aosRefreshHandler) {
     window.removeEventListener('load', aosRefreshHandler);
     aosRefreshHandler = null;
   }
+  window.removeEventListener('resize', updateVisibleCards);
+  
+  // Stop certification carousel
+  stopAutoPlay();
 });
 
-/* -------------------------
-   Data arrays (unchanged)
-   ------------------------- */
 const categories = [
   {
     image: '/storage/assets/home/Thermoplastic.png',
     title: 'Thermoplastic Materials & Engineering Plastics',
     description: 'High-performance TPE compounds offering excellent flexibility, durability, and processing characteristics for diverse applications.',
-    section: 'plastic'  // ADD THIS
+    section: 'plastic'
   },
   {
     image: '/storage/assets/home/Molded.png',
     title: 'Molded Rubber Compounds',
     description: 'Specialized compounds designed for demanding mechanical, thermal, and chemical resistance applications.',
-    section: 'rubber'  // ADD THIS
+    section: 'rubber'
   },
   {
     image: '/storage/assets/home/Resin.png',
     title: 'Master Batch of Resin',
     description: 'Tailored polymer solutions developed to meet your specific performance, regulatory, and processing requirements.',
-    section: 'custom'  // ADD THIS
+    section: 'custom'
   },
   {
     image: '/storage/assets/home/Services.png',
     title: 'Engineering, Design & Technical Services',
     description: 'Comprehensive support including material selection, testing, processing optimization, and troubleshooting.',
-    section: 'services'  // ADD THIS
+    section: 'services'
   }
 ];
 
@@ -797,11 +932,46 @@ const recognitionAwards = [
 ];
 </script>
 
-
 <style scoped>
+/* 3D Rotation Classes */
+.cert-rotate-y-0 { transform: rotateY(0deg); }
+.cert-rotate-y-90 { transform: rotateY(90deg); }
+.cert-rotate-y-neg-90 { transform: rotateY(-90deg); }
 
+/* Custom Animations */
+@keyframes cert-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
 
-/* Spinner */
+@keyframes cert-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cert-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes cert-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cert-bounce { animation: cert-bounce 3s ease-in-out infinite; }
+.cert-spin { animation: cert-spin 8s linear infinite; }
+.cert-float { animation: cert-float 3s ease-in-out infinite; }
+.cert-float-delayed { animation: cert-float 3s ease-in-out infinite 1s; }
+.cert-fade-in { animation: cert-fade-in 0.8s ease-out; }
+.cert-fade-in-delayed { animation: cert-fade-in 0.8s ease-out 0.2s; }
+
+/* Background Pattern */
+.cert-pattern {
+  background-image: radial-gradient(circle, #3B82F6 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
 .spinner-wrapper {
   position: fixed;
   inset: 0;
@@ -822,8 +992,6 @@ const recognitionAwards = [
   z-index: 99999;
 }
 
-
-/* Responsive */
 @media (max-width: 1015px) {
   .hexagon {
     width: 80px;
@@ -858,7 +1026,6 @@ const recognitionAwards = [
   }
 }
 
-/* Infinite Scroll Animation */
 @keyframes scroll {
   0% {
     transform: translateX(0);
@@ -877,7 +1044,6 @@ const recognitionAwards = [
   animation-play-state: paused;
 }
 
-/* Responsive adjustments */
 @media (max-width: 640px) {
   .animate-scroll > div {
     width: 12rem !important;
