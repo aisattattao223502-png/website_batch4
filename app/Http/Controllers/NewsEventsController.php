@@ -60,7 +60,7 @@ class NewsEventsController extends Controller
         // Fetch all news with batch information
         $newsData = DB::table('news_events')
             ->where('type', 'news')
-            ->orderBy(DB::raw('COALESCE(batch, 1)'), 'asc')
+            ->orderBy(DB::raw('COALESCE(Batch, 1)'), 'asc')
             ->orderBy('date', 'desc')
             ->get()
             ->map(function ($item) {
@@ -81,7 +81,7 @@ class NewsEventsController extends Controller
                     $item->image = '/storage/assets/img/placeholder.png';
                 }
                 
-                $item->batch = $item->batch ?? 1;
+                $item->batch = $item->Batch ?? 1;
                 
                 return $item;
             });

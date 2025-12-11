@@ -4,7 +4,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\AdminUsersController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
-
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\NewsEventsController;
 
 use Illuminate\Support\Facades\DB;
@@ -65,7 +65,6 @@ Route::post('/visitors/increment', function () {
 Route::get('/', function () {
     $products = \App\Models\Product::orderBy('material_type')->orderBy('name')->get();
     $services = \App\Models\Service::all();
-
     $customers = \App\Models\Customer::orderBy('display_order')->get();
     
     return Inertia::render('Website/Home', [
@@ -178,7 +177,10 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact/submit', [ContactController::class, 'submit'])->name('contact.submit');
 
 Route::get('/sustainability', fn() => Inertia::render('Website/More/Sustainability'))->name('sustainability');
-Route::get('/faq', fn() => Inertia::render('Website/More/FAQ'))->name('faq');
+
+// FAQ page route - Using controller
+Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
+
 Route::get('/privacy-policy', fn() => Inertia::render('Website/More/PrivacyPolicy'))->name('privacy-policy');
 
 // Overview Process page route
@@ -223,9 +225,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
-        // Admin Products Page
-        Route::get('/products', [AdminProductController::class, 'indexPage'])->name('products.index');
-
         // Admin Inquiries Page
         Route::get('/inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
         Route::patch('/inquiries/{id}/status', [InquiryController::class, 'updateStatus'])->name('inquiries.update-status');
@@ -318,34 +317,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/reorder', [\App\Http\Controllers\Admin\CustomerController::class, 'reorder'])->name('reorder');
             Route::post('/settings', [\App\Http\Controllers\Admin\CustomerController::class, 'updateSettings'])->name('settings');
         });
-        
-        /*
-        |--------------------------------------------------------------------------
-        | Inquiries Management
-        |--------------------------------------------------------------------------
-        */
-        Route::prefix('inquiries')->name('inquiries.')->group(function () {
-            Route::get('/', [InquiryController::class, 'index'])->name('index');
-            Route::get('/export', [InquiryController::class, 'export'])->name('export');
-            Route::patch('/{id}/status', [InquiryController::class, 'updateStatus'])->name('update-status');
-            Route::post('/{id}/reply', [InquiryController::class, 'sendReply'])->name('reply');
-            Route::delete('/{id}', [InquiryController::class, 'destroy'])->name('destroy');
-        });
     });
 });
 
 require __DIR__.'/auth.php';
-
-/*
-|--------------------------------------------------------------------------
-| Admin API Routes
-|--------------------------------------------------------------------------
-*/
-
-Route::prefix('admin/api')->name('admin.api.')->group(function () {
-    Route::apiResource('products', AdminProductController::class);
-    Route::post('products/bulk-destroy', [AdminProductController::class, 'bulkDestroy'])->name('products.bulk-destroy');
-    Route::post('products/upload-image', [AdminProductController::class, 'uploadImage'])->name('products.upload-image');
-
-    Route::apiResource('services', AdminServiceController::class);
-});

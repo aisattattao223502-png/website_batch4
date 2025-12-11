@@ -45,4 +45,33 @@ class Product extends Model
 
         return $badges[$this->category] ?? 'bg-gray-100 text-gray-800';
     }
+
+    /**
+     * Automatically fix image URL format
+     */
+    public function getImageUrlAttribute($value)
+    {
+        // If empty, return as is
+        if (!$value) {
+            return $value;
+        }
+
+        // If starts with http:// or https://, return as is (external URL)
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+
+        // If already starts with /storage/, return as is
+        if (str_starts_with($value, '/storage/')) {
+            return $value;
+        }
+
+        // If starts with assets/, prepend /storage/
+        if (str_starts_with($value, 'assets/')) {
+            return '/storage/' . $value;
+        }
+
+        // Otherwise, return as is
+        return $value;
+    }
 }

@@ -53,13 +53,13 @@
 
       <!-- Actions -->
       <div class="flex gap-2 ml-4">
-        <button
+        <!-- <button
           @click="$emit('reply', inquiry)"
           class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
           title="Reply"
         >
           <i class="fas fa-reply"></i>
-        </button>
+        </button> -->
         <button
           @click="showStatusMenu = !showStatusMenu"
           class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition relative"

@@ -172,48 +172,51 @@
           <div class="mb-12 text-center">
             <h2 class="text-4xl font-bold mb-4 text-blue-600">Latest Headlines</h2>
             <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-              Stay informed with our most important news and announcements
+            Stay informed with our most important news and announcements
             </p>
           </div>
 
           <!-- Headline Article -->
-          <Link :href="`/news-events/${headlineArticle.id}`" class="group cursor-pointer mb-16 block">
+          <div class="mb-16 block">
             <div class="relative overflow-hidden rounded-2xl shadow-2xl">
               <img
                 :src="headlineArticle.image_path"
                 :alt="headlineArticle.title"
-                class="w-full h-96 md:h-[500px] object-cover transform group-hover:scale-105 transition-transform duration-700"
+                class="w-full h-96 md:h-[500px] object-cover"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+              <!-- Updated gradient overlay for better mobile visibility -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent md:from-black/90 md:via-black/20"></div>
 
               <!-- Featured badge -->
-              <div class="absolute top-6 left-6">
-                <span class="px-4 py-2 bg-red-500 text-white text-sm font-bold rounded-full shadow-lg">
-                  <i class="fas fa-star mr-2"></i>BREAKING NEWS
+              <div class="absolute top-4 left-4 md:top-6 md:left-6">
+                <span class="px-3 py-1.5 md:px-4 md:py-2 bg-red-500 text-white text-xs md:text-sm font-bold rounded-full shadow-lg">
+                  <i class="fas fa-star mr-1 md:mr-2"></i>BREAKING NEWS
                 </span>
               </div>
 
               <!-- Date badge -->
-              <div class="absolute top-6 right-6">
-                <span class="px-4 py-2 bg-white/90 text-gray-800 text-sm font-semibold rounded-full shadow-lg">
-                  <i class="fas fa-calendar mr-2"></i>{{ formatDate(headlineArticle.date) }}
+              <div class="absolute top-4 right-4 md:top-6 md:right-6">
+                <span class="px-3 py-1.5 md:px-4 md:py-2 bg-white/90 text-gray-800 text-xs md:text-sm font-semibold rounded-full shadow-lg">
+                  <i class="fas fa-calendar mr-1 md:mr-2"></i>{{ formatDate(headlineArticle.date) }}
                 </span>
               </div>
 
-              <!-- Content overlay -->
-              <div class="absolute bottom-0 left-0 w-full p-6 md:p-8">
-                <div class="max-w-4xl">
-                  <h3 class="text-white font-bold text-2xl md:text-3xl leading-tight mb-3">
+              <!-- Content overlay - Now using min-h instead of absolute bottom -->
+              <div class="absolute inset-x-0 bottom-0 p-4 md:p-6 lg:p-8 min-h-[40%] flex items-end">
+                <div class="max-w-4xl w-full">
+                  <!-- Title -->
+                  <h3 class="text-white font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight mb-2 md:mb-3">
                     {{ headlineArticle.title }}
                   </h3>
-                  <p class="text-white/90 text-base md:text-lg leading-relaxed max-w-4xl">
+                  <!-- Description -->
+                  <p class="text-white/90 text-sm sm:text-base md:text-lg leading-relaxed max-w-4xl">
                     {{ headlineArticle.description }}
                   </p>
                 </div>
               </div>
             </div>
-          </Link>
-        </div>
+          </div>
+            </div>
       </section>
 
       <!-- Empty State -->
@@ -309,8 +312,9 @@
         <div id="content-grid">
           <!-- News Items with Batch Grouping -->
           <div v-if="activeFilter === 'news'">
-            <div v-for="(group, batchNumber) in groupedNews" :key="batchNumber" class="mb-12">
-              <!-- Batch Header -->
+            <!-- Batch 1 - 16 stories -->
+            <div v-if="batch1News.length > 0" class="mb-12">
+              <!-- Batch 1 Header -->
               <div class="mb-6">
                 <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
                   <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-20"></div>
@@ -321,8 +325,8 @@
                           <i class="fas fa-quote-left text-lg"></i>
                         </div>
                         <div>
-                          <h3 class="text-xl font-bold mb-0">Batch {{ batchNumber }}</h3>
-                          <p class="text-blue-100 text-sm">{{ group.items.length }} {{ group.items.length !== 1 ? 'stories' : 'story' }}</p>
+                          <h3 class="text-xl font-bold mb-0">Batch 1</h3>
+                          <p class="text-blue-100 text-sm">{{ batch1News.length }} {{ batch1News.length !== 1 ? 'stories' : 'story' }}</p>
                         </div>
                       </div>
                     </div>
@@ -330,18 +334,130 @@
                 </div>
               </div>
 
-              <!-- News Grid -->
+              <!-- Batch 1 Grid -->
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <Link
-                  v-for="item in group.items"
+                  v-for="item in batch1News"
                   :key="item.id"
                   :href="`/news-events/${item.id}`"
                   class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-[420px] hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
                 >
-                  <div class="relative">
+                  <div class="relative overflow-hidden">
                     <img :src="item.image" :alt="item.title" class="w-full h-48 object-cover" />
                     <span class="absolute top-4 left-4 px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-full">
-                      Batch {{ batchNumber }}
+                      BATCH 1
+                    </span>
+                  </div>
+                  <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center text-sm text-gray-500 mb-3">
+                      <i class="fas fa-calendar mr-2"></i>
+                      {{ formatDate(item.date) }}
+                    </div>
+                    <h4 class="font-bold text-xl leading-tight mb-4 text-blue-600 min-h-[56px]">
+                      {{ item.title }}
+                    </h4>
+                    <div class="flex-1"></div>
+                    <div class="w-full mt-2">
+                      <div class="inline-flex items-center font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                        Read Story
+                        <i class="fas fa-arrow-right ml-2"></i>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </div>
+
+            <!-- Batch 2 - 11 stories -->
+            <div v-if="batch2News.length > 0" class="mb-12">
+              <!-- Batch 2 Header -->
+              <div class="mb-6">
+                <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-20"></div>
+                  <div class="relative z-10">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center">
+                        <div class="bg-white/20 rounded-full p-2 mr-3">
+                          <i class="fas fa-quote-left text-lg"></i>
+                        </div>
+                        <div>
+                          <h3 class="text-xl font-bold mb-0">Batch 2</h3>
+                          <p class="text-blue-100 text-sm">{{ batch2News.length }} {{ batch2News.length !== 1 ? 'stories' : 'story' }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Batch 2 Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <Link
+                  v-for="item in batch2News"
+                  :key="item.id"
+                  :href="`/news-events/${item.id}`"
+                  class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-[420px] hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                >
+                  <div class="relative overflow-hidden">
+                    <img :src="item.image" :alt="item.title" class="w-full h-48 object-cover" />
+                    <span class="absolute top-4 left-4 px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-full">
+                      BATCH 2
+                    </span>
+                  </div>
+                  <div class="p-6 flex flex-col flex-1">
+                    <div class="flex items-center text-sm text-gray-500 mb-3">
+                      <i class="fas fa-calendar mr-2"></i>
+                      {{ formatDate(item.date) }}
+                    </div>
+                    <h4 class="font-bold text-xl leading-tight mb-4 text-blue-600 min-h-[56px]">
+                      {{ item.title }}
+                    </h4>
+                    <div class="flex-1"></div>
+                    <div class="w-full mt-2">
+                      <div class="inline-flex items-center font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                        Read Story
+                        <i class="fas fa-arrow-right ml-2"></i>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </div>
+
+            <!-- Batch 3 - 26 stories -->
+            <div v-if="batch3News.length > 0" class="mb-12">
+              <!-- Batch 3 Header -->
+              <div class="mb-6">
+                <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-20"></div>
+                  <div class="relative z-10">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center">
+                        <div class="bg-white/20 rounded-full p-2 mr-3">
+                          <i class="fas fa-quote-left text-lg"></i>
+                        </div>
+                        <div>
+                          <h3 class="text-xl font-bold mb-0">Batch 3</h3>
+                          <p class="text-blue-100 text-sm">{{ batch3News.length }} {{ batch3News.length !== 1 ? 'stories' : 'story' }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Batch 3 Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <Link
+                  v-for="item in batch3News"
+                  :key="item.id"
+                  :href="`/news-events/${item.id}`"
+                  class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-[420px] hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                >
+                  <div class="relative overflow-hidden">
+                    <img :src="item.image" :alt="item.title" class="w-full h-48 object-cover" />
+                    <span class="absolute top-4 left-4 px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-full">
+                      BATCH 3
                     </span>
                   </div>
                   <div class="p-6 flex flex-col flex-1">
@@ -559,6 +675,22 @@ const groupedNews = computed(() => {
     groups[item.batch].items.push(item);
   });
   return groups;
+});
+
+// Separate batches into individual computed properties
+const batch1News = computed(() => {
+  if (!props.newsData) return [];
+  return props.newsData.filter(item => Number(item.batch) === 1);
+});
+
+const batch2News = computed(() => {
+  if (!props.newsData) return [];
+  return props.newsData.filter(item => Number(item.batch) === 2);
+});
+
+const batch3News = computed(() => {
+  if (!props.newsData) return [];
+  return props.newsData.filter(item => Number(item.batch) === 3);
 });
 
 // All content combined
@@ -854,11 +986,32 @@ onUnmounted(() => {
   transform: translateY(-5px);
 }
 
-/* Line clamp utility */
+/* Line clamp utility for headline text */
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Override line-clamp on larger screens */
+@media (min-width: 768px) {
+  .md\:line-clamp-none {
+    display: block;
+  }
+}
+
+/* Ensure image is always visible on mobile */
+@media (max-width: 768px) {
+  .headline-article-image {
+    min-height: 400px;
+    object-fit: cover;
+  }
 }
 
 /* Responsive adjustments */

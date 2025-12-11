@@ -74,7 +74,7 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
         $image = $request->file('image');
         $filename = time() . '_' . $image->getClientOriginalName();
-        $path = $image->storeAs('products', $filename, 'public');
+        $path = $image->storeAs('assets/products', $filename, 'public');
         $validated['image_url'] = '/storage/' . $path;
         // This creates: /storage/products/1234567890_image.jpg
         }
@@ -145,7 +145,7 @@ class ProductController extends Controller
                 
                 $image = $request->file('image');
                 $filename = time() . '_' . $image->getClientOriginalName();
-                $path = $image->storeAs('products', $filename, 'public');
+                $path = $image->storeAs('assets/products', $filename, 'public');
                 $validated['image_url'] = '/storage/' . $path;
             } else {
                 // Keep existing image if no new image uploaded

@@ -244,79 +244,82 @@
 
 
     <!-- Customers Section - Single Line Carousel with Buttons -->
-    <section class="py-16 bg-white">
-      <div class="container mx-auto px-4">
-        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
-          Our Valued Customers
-        </h2>
-        <p class="text-xl text-center text-gray-600 max-w-3xl mx-auto mb-12">
-          We're proud to partner with industry leaders across various sectors, providing them with high-performance polymer solutions.
-        </p>
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-4">
+      Our Valued Customers
+    </h2>
+    <p class="text-xl text-center text-gray-600 max-w-3xl mx-auto mb-12">
+      We're proud to partner with industry leaders across various sectors, providing them with high-performance polymer solutions.
+    </p>
 
-        <!-- Single Line Carousel with Navigation -->
-        <div class="relative max-w-7xl mx-auto">
-          <!-- Carousel Container -->
-          <div class="overflow-hidden">
-            <div 
-              class="flex transition-transform duration-500 ease-in-out"
-              :style="{ transform: `translateX(-${currentSlide * slideWidth}px)` }"
-            >
-              <!-- Customer Logos -->
-              <div
-                v-for="(logo, index) in allCustomerLogos"
-                :key="index"
-                class="flex-shrink-0 px-4"
-                :style="{ width: `${cardWidth}px` }"
-              >
-                <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 p-8 flex items-center justify-center h-40">
-                  <img
-                    v-if="logo !== 'coming_soon'"
-                    :src="logo"
-                    alt="Customer Logo"
-                    class="max-w-full max-h-24 object-contain"
-                  />
-                  <span v-else class="text-green-600 font-bold text-center">
-                    Coming Soon
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Navigation Buttons -->
-          <button
-            @click="prevSlide"
-            :disabled="currentSlide === 0"
-            class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 bg-white hover:bg-blue-600 text-blue-600 hover:text-white rounded-full p-3 md:p-4 shadow-lg transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed z-10"
-            aria-label="Previous slide"
+    <!-- Single Line Carousel with Navigation -->
+    <div class="relative max-w-7xl mx-auto">
+      <!-- Carousel Container -->
+      <div class="overflow-hidden">
+        <div 
+          class="flex transition-transform duration-500 ease-in-out"
+          :style="{ transform: `translateX(-${currentSlide * slideWidth}px)` }"
+        >
+          <!-- Customer Logos -->
+          <div
+            v-for="(logo, index) in allCustomerLogos"
+            :key="index"
+            class="flex-shrink-0 px-4"
+            :style="{ width: `${cardWidth}px` }"
           >
-            <i class="fas fa-chevron-left text-lg md:text-xl"></i>
-          </button>
-
-          <button
-            @click="nextSlide"
-            :disabled="currentSlide >= maxSlide"
-            class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 bg-white hover:bg-blue-600 text-blue-600 hover:text-white rounded-full p-3 md:p-4 shadow-lg transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed z-10"
-            aria-label="Next slide"
-          >
-            <i class="fas fa-chevron-right text-lg md:text-xl"></i>
-          </button>
-
-          <!-- Progress Bar -->
-          <div class="mt-8 mx-auto max-w-md">
-            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                class="h-full bg-blue-600 transition-all duration-300 rounded-full"
-                :style="{ width: `${progress}%` }"
-              ></div>
-            </div>
-            <div class="text-center mt-2 text-sm text-gray-600">
-              {{ currentSlide + 1 }} / {{ maxSlide + 1 }}
+            <!-- FIXED: Added overflow-hidden to prevent image overflow -->
+            <!-- style="max-height: 180px; max-width: 360px;" => adjusts the size of the logo images -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 p-8 flex items-center justify-center h-40 overflow-hidden">
+              <img
+                v-if="logo !== 'coming_soon'"
+                :src="logo"
+                alt="Customer Logo"
+                class="max-w-full max-h-24 object-contain"
+                style="max-height: 180px; max-width: 360px;" 
+              />
+              <span v-else class="text-green-600 font-bold text-center">
+                Coming Soon
+              </span>
             </div>
           </div>
         </div>
       </div>
-    </section>
+
+      <!-- Navigation Buttons -->
+      <button
+        @click="prevSlide"
+        :disabled="currentSlide === 0"
+        class="absolute left-2 md:left-0 top-1/2 -translate-y-1/2 md:-translate-x-12 bg-white hover:bg-blue-600 text-blue-600 hover:text-white rounded-full p-3 md:p-4 shadow-lg transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed z-10"
+        aria-label="Previous slide"
+      >
+        <i class="fas fa-chevron-left text-lg md:text-xl"></i>
+      </button>
+
+      <button
+        @click="nextSlide"
+        :disabled="currentSlide >= maxSlide"
+        class="absolute right-2 md:right-0 top-1/2 -translate-y-1/2 md:translate-x-12 bg-white hover:bg-blue-600 text-blue-600 hover:text-white rounded-full p-3 md:p-4 shadow-lg transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed z-10"
+        aria-label="Next slide"
+      >
+        <i class="fas fa-chevron-right text-lg md:text-xl"></i>
+      </button>
+
+      <!-- Progress Bar -->
+      <div class="mt-8 mx-auto max-w-md">
+        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div 
+            class="h-full bg-blue-600 transition-all duration-300 rounded-full"
+            :style="{ width: `${progress}%` }"
+          ></div>
+        </div>
+        <div class="text-center mt-2 text-sm text-gray-600">
+          {{ currentSlide + 1 }} / {{ maxSlide + 1 }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
     <!-- Statistics Section -->
     <section class="py-16 bg-white">
@@ -336,7 +339,7 @@
             {{ visitorCount.toLocaleString() }}
           </div>
           <div class="mt-2 text-2xl font-semibold text-gray-700">
-            Number of Visitors
+            Total Number of Visitors
           </div>
         </div>
 
@@ -353,6 +356,46 @@
   </div>
   <div>
     <Footer />
+    <!-- 1. Add this audio element in your template, right before the closing </div> of the homepage -->
+<!-- Place it after the Footer component -->
+
+<!-- Audio Player Controls - Fixed Bottom Left -->
+<div class="fixed bottom-6 left-6 z-50 flex flex-col gap-3">
+  <!-- Play/Pause Button -->
+  <button
+    @click="togglePlay"
+    class="w-14 h-14 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 shadow-lg"
+    :title="isPlaying ? 'Pause Music' : 'Play Music'"
+  >
+    <i 
+      class="fas text-white text-xl transition-all duration-300"
+      :class="isPlaying ? 'fa-pause' : 'fa-play'"
+    ></i>
+  </button>
+
+  <!-- Mute/Unmute Button -->
+  <button
+    @click="toggleMute"
+    class="w-14 h-14 bg-white hover:bg-gray-50 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110 shadow-lg border border-gray-200"
+    :title="isMuted ? 'Unmute' : 'Mute'"
+  >
+    <i 
+      class="fas text-gray-700 text-xl transition-all duration-300"
+      :class="isMuted ? 'fa-volume-mute' : 'fa-volume-up'"
+    ></i>
+  </button>
+</div>
+
+<!-- Hidden Audio Element -->
+<audio
+  ref="audioPlayer"
+  loop
+  class="hidden"
+>
+  <source src="/storage/assets/audio/Home Page Song.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
   </div>
 </template>
 
@@ -372,6 +415,41 @@ import axios from 'axios'
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 AOS.init();
+
+// Audio player state
+const audioPlayer = ref(null);
+const isPlaying = ref(false);
+const isMuted = ref(false);
+
+// Audio control functions
+const togglePlay = () => {
+  if (!audioPlayer.value) return;
+  
+  if (isPlaying.value) {
+    audioPlayer.value.pause();
+    isPlaying.value = false;
+  } else {
+    audioPlayer.value.play();
+    isPlaying.value = true;
+  }
+};
+
+const toggleMute = () => {
+  if (!audioPlayer.value) return;
+  
+  audioPlayer.value.muted = !audioPlayer.value.muted;
+  isMuted.value = audioPlayer.value.muted;
+};
+
+// ... rest of your existing script ...
+
+// Update the onUnmounted to clean up
+onUnmounted(() => {
+  if (aosRefreshHandler) {
+    window.removeEventListener('load', aosRefreshHandler);
+    aosRefreshHandler = null;
+  }
+});
 
 const isLoading = ref(false);
 
@@ -517,26 +595,24 @@ const layout = ref([
 // Customer logos array
 const allCustomerLogos = [
   "storage/assets/home/3M.png",
-  "storage/assets/home/Unilab.png",
+  "storage/assets/home/ACS.png",
   "storage/assets/home/APC.png",
   "storage/assets/home/Carrier.png",
-  "storage/assets/home/Panasonic.png",
-  "storage/assets/home/Koppel.png",
-  "storage/assets/home/Dutch.png",
-  "storage/assets/home/WB.png",
-  "storage/assets/home/ACS.png",
-  "storage/assets/home/Purefoods.png",
   "storage/assets/home/Condura.png",
   "storage/assets/home/Continental.png",
-  "storage/assets/home/soon.jpg",
-  "storage/assets/home/soon.jpg",
-  "storage/assets/home/soon.jpg",
+  "storage/assets/home/Dutch.png",
+  "storage/assets/home/Koppel.png",
+  "storage/assets/home/Panasonic.png",
+  "storage/assets/home/Purefoods.png",
+  "storage/assets/home/Unilab.png",
+  "storage/assets/home/WB.png",
+  "storage/assets/home/1763603561_6915a5b593d3e.jpg",
 ];
 
 // Carousel state
 const currentSlide = ref(0);
-const cardWidth = ref(280); // Width of each card + padding
-const visibleCards = ref(4); // Number of visible cards at once
+const cardWidth = ref(400); // Increased width for bigger logos
+const visibleCards = ref(3); // Changed to 3 visible cards at once
 
 // Computed properties
 const slideWidth = computed(() => cardWidth.value);
@@ -564,16 +640,13 @@ const updateVisibleCards = () => {
   const width = window.innerWidth;
   if (width < 640) {
     visibleCards.value = 1;
-    cardWidth.value = 240;
-  } else if (width < 768) {
-    visibleCards.value = 2;
-    cardWidth.value = 260;
+    cardWidth.value = 320;
   } else if (width < 1024) {
-    visibleCards.value = 3;
-    cardWidth.value = 270;
+    visibleCards.value = 2;
+    cardWidth.value = 360;
   } else {
-    visibleCards.value = 4;
-    cardWidth.value = 280;
+    visibleCards.value = 3;
+    cardWidth.value = 400;
   }
   // Reset to first slide if current position is invalid
   if (currentSlide.value > maxSlide.value) {
@@ -810,6 +883,17 @@ const recognitionAwards = [
     width: 12rem !important;
     margin-left: 0.75rem !important;
     margin-right: 0.75rem !important;
+  }
+}
+/* Audio player animations */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
   }
 }
 </style>

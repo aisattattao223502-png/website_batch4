@@ -88,7 +88,7 @@ const handleImageError = (event) => {
               <div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
                 <img 
                   v-if="product.image_url" 
-                  :src="`/storage/${product.image_url}`" 
+                  :src="product.image_url" 
                   :alt="product.name"
                   @error="handleImageError"
                   class="w-full h-full object-contain"
