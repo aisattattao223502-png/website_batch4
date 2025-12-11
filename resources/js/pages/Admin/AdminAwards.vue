@@ -109,10 +109,18 @@ const handleImageSelect = (event) => {
 
 // Submit form
 const submitForm = () => {
+
+    if (modalType.value === 'award' && modalMode.value === 'create') {
+        if (!awardForm.image) {
+            alert('Please upload an image for the award.');
+            return;
+        }
+    }
+    
     if (modalType.value === 'award') {
         if (modalMode.value === 'create') {
             awardForm.post(route('admin.awards.store'), {
-                forceFormData: true, // ADD THIS
+                forceFormData: true, 
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
             });

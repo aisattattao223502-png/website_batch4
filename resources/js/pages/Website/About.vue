@@ -339,20 +339,72 @@
         </div>
       </section>
     </div>
-
+    
     <Footer />
   </div>
+  <!-- Audio Player -->
+<audio ref="audioPlayer" loop>
+  <source src="/storage/assets/Song 2.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Floating Mute Button (Bottom Left) -->
+<button
+  @click="toggleAudio"
+  class="fixed bottom-6 left-6 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg transition-all duration-300 transform hover:scale-110"
+  :title="isPlaying ? 'Mute Music' : 'Play Music'"
+>
+  <svg 
+    v-if="isPlaying"
+    xmlns="http://www.w3.org/2000/svg" 
+    fill="none" 
+    viewBox="0 0 24 24" 
+    stroke-width="2" 
+    stroke="currentColor" 
+    class="w-6 h-6"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+  </svg>
+  <svg 
+    v-else
+    xmlns="http://www.w3.org/2000/svg" 
+    fill="none" 
+    viewBox="0 0 24 24" 
+    stroke-width="2" 
+    stroke="currentColor" 
+    class="w-6 h-6"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.501-1.938-1.354A9.01 9.01 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+  </svg>
+</button>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import Header from '../../layouts/Header.vue';
 import Footer from '../../layouts/Footer.vue';
 import Chatbot from '@/layouts/Chatbot.vue';
 
+// Audio player state
+const isPlaying = ref(true);
+const audioPlayer = ref(null);
+
+// Timeline state
 const expandedTimeline = ref(null);
 
+// Audio methods
+const toggleAudio = () => {
+  if (audioPlayer.value) {
+    if (isPlaying.value) {
+      audioPlayer.value.pause();
+    } else {
+      audioPlayer.value.play();
+    }
+    isPlaying.value = !isPlaying.value;
+  }
+};
+
+// Timeline methods
 const toggleTimeline = (index) => {
   expandedTimeline.value = expandedTimeline.value === index ? null : index;
 };
@@ -409,6 +461,24 @@ const timelineEvents = [
     photo: null
   }
 ];
+
+// Lifecycle hooks
+onMounted(() => {
+  if (audioPlayer.value) {
+    audioPlayer.value.volume = 0.3; // Set volume to 30%
+    audioPlayer.value.play().catch(err => {
+      // Auto-play might be blocked by browser
+      console.log('Auto-play blocked:', err);
+      isPlaying.value = false;
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (audioPlayer.value) {
+    audioPlayer.value.pause();
+  }
+});
 </script>
 
 <style scoped>

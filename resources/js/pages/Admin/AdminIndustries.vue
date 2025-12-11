@@ -42,7 +42,14 @@ const handleImageSelect = (event) => {
 };
 
 // Submit form
+// Submit form
 const submitForm = () => {
+    // Validate image for create mode
+    if (props.mode === 'create' && !form.image) {
+        alert('Please upload an image for the industry.');
+        return;
+    }
+
     if (props.mode === 'create') {
         form.post(route('admin.industries.store'), {
             forceFormData: true,
