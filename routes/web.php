@@ -56,6 +56,10 @@ Route::post('/visitors/increment', function () {
     return response()->json(['count' => $count]);
 });
 
+// Credit Page
+Route::get('/credits', function () {
+    return Inertia::render('credits/Credit');
+})->name('credits');
 /*
 |--------------------------------------------------------------------------
 | Public Website Routes
